@@ -1,21 +1,29 @@
 <script setup lang="ts">
+import { ref } from 'vue';
+import type { Client } from '@/types';
+import Header from './components/header/header.vue';
+import Clients from './components/clients/clients.vue';
+import Main from './components/main/Main.vue';
+
+const client = ref<Client | null>(null);
 </script>
 
 <template>
-  <router-view />
+  <el-container class="container">
+    <Header />
+    <el-container>
+      <Clients v-model="client" />
+      <Main :client="client" />
+<!--      <el-main>-->
+<!--        <router-view />-->
+<!--      </el-main>-->
+    </el-container>
+  </el-container>
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+<style lang="scss" scoped>
+.container {
+  display: flex;
+  flex-direction: column;
 }
 </style>
