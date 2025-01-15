@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useClientSidebar } from '../model/clientStore.ts';
+import { useClientStore } from '../model/clientStore.ts';
 import { Client } from '../../../shared/types';
 import AddClientModal from './AddClientModal.vue';
 
@@ -14,7 +14,7 @@ const {
   filterClients,
   clients,
   addNewClient,
-} = useClientSidebar();
+} = useClientStore();
 
 const showAddClientModal = ref<boolean>(false);
 const drawer = ref<boolean>(true);

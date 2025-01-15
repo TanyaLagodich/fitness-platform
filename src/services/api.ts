@@ -2,7 +2,7 @@ import axios from 'axios';
 import { Client } from '@/shared/types';
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000/api', // Базовый URL вашего бэкенда
+    baseURL: 'http://localhost:4000/api', // Базовый URL вашего бэкенда
 });
 
 export const getClients = async (search = '') => {

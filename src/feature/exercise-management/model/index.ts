@@ -20,7 +20,8 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
     };
 
     const deleteExercise = (exercise: ExerciseInWorkout, index: number) => {
-        exercises.value.splice(index, 1);
+        console.log({ exercise, index });
+        // exercises.value.splice(index, 1);
     }
 
     const addSuperset = (newExercises: Exercise[]) => {

@@ -19,7 +19,11 @@ export interface Exercise {
 
 export interface ExerciseInWorkout {
     type: 'single' | 'superset';
-    exercises: (Exercise & { repeats: Repeat[] })[];
+    exercises: ExerciseWithRepeats[];
+}
+
+export interface ExerciseWithRepeats extends Exercise {
+    repeats: Repeat[];
 }
 
 export interface Repeat {
