@@ -3,12 +3,10 @@ import { useRoute } from 'vue-router';
 import { computed, onMounted, ref } from 'vue';
 import { VDateInput } from 'vuetify/labs/VDateInput';
 import { useClientStore } from '@/entities/client';
-import { useExercisesStore } from "@/entities/exercise";
 import {AddExerciseModal, ExerciseList, useExerciseManagementStore} from "@/feature/exercise-management";
 import { Exercise } from '@/shared/types';
 
 const clientStore = useClientStore();
-const exercisesStore = useExercisesStore();
 const exerciseManagementStore = useExerciseManagementStore();
 
 const route = useRoute();
@@ -21,7 +19,7 @@ const workout = ref({
 const isAddExerciseModalShown = ref<boolean>(false);
 
 onMounted(() => {
-  if (clientStore.client!.id !== clientId.value) {
+  if (clientStore.client?.id !== clientId.value) {
     clientStore.getClient(clientId.value);
   }
 });

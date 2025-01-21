@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import {onMounted, ref} from 'vue';
+import { ref } from 'vue';
 import type { Client } from '@/shared/types';
 import { getClientById } from "@/services/api.ts";
 

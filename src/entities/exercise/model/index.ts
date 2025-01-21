@@ -6,8 +6,12 @@ import { Exercise } from "@/shared/types";
 export const useExercisesStore = defineStore('exercises', () => {
     const exercises = ref<Exercise[]>([]);
     const bodyParts = ref<string[]>([]);
+    const query = {
+        limit: 20,
+        offset: 0,
+    };
 
-    const fetchExercises = async ({ limit = 10, offset = 0}: { limit: number; offset: number}) => {
+    const fetchExercises = async ({ limit = 20, offset = 0}: { limit: number; offset: number}) => {
         try {
             const data = await getExercises({ limit, offset });
             exercises.value = data;
@@ -16,11 +20,11 @@ export const useExercisesStore = defineStore('exercises', () => {
         }
     }
 
-    const getExercisesByBodyPart = async (bodyPart: string) => {
+    const getExercisesByBodyPart = async (bodyPart: string, query?: { limit: number; offset: number }) => {
         if (!bodyPart) return;
 
         try {
-            const data = await getExercisesForBodyPart({ bodyPart });
+            const data = await getExercisesForBodyPart({ bodyPart, ...query! });
             exercises.value = data;
         } catch (err) {
             console.error(err);
@@ -36,9 +40,9 @@ export const useExercisesStore = defineStore('exercises', () => {
         }
     }
 
-    const getExercisesByName = async (name: string) => {
+    const getExercisesByName = async (name: string, query?: { limit: number; offset: number }) => {
         try {
-            const data = await fetchExercisesByName({ name });
+            const data = await fetchExercisesByName({ name, ...query! });
             exercises.value = data;
         } catch (err) {
             console.error(err);

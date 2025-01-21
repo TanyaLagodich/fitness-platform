@@ -45,7 +45,8 @@ const items = ref([
       <v-navigation-drawer
           v-model="drawer"
           :location="$vuetify.display.mobile ? 'bottom' : undefined"
-          temporary
+          :class="{ 'position-fixed': $vuetify.display.mobile }"
+          :temporary="true"
       >
         <v-list-item
             v-for="(item, i) in items"

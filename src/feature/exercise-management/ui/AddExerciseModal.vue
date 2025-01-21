@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import {ref, watch} from "vue";
-import {Exercise, useExercisesStore} from "@/entities/exercise";
+import { ref, watch } from "vue";
+import { Exercise, useExercisesStore } from "@/entities/exercise";
+import type { Exercise as TypeExercise } from '@/shared/types';
+import { debounce } from '@/shared/lib';
 
 defineProps<{ modelValue: boolean }>();
-defineEmits<{
+const emits = defineEmits<{
   (e: 'update:modelValue', modelValue: boolean): void,
-  (e: 'create-superset', exercises: Exercise[]): void,
-  (e: 'save-exercises', exercises: Exercise[]): void,
+  (e: 'create-superset', exercises: TypeExercise[]): void,
+  (e: 'save-exercises', exercises: TypeExercise[]): void,
 }>();
 
 const exercisesStore = useExercisesStore();
@@ -14,22 +16,46 @@ const exercisesStore = useExercisesStore();
 const searchExercise = ref<string>('');
 const selectedBodyParts = ref<string | undefined>(undefined);
 const exercises = ref(new Set());
+const query = {
+  limit: 20,
+  offset: 0,
+}
 
-const handleSearchExercises = (value) => {
-  if (!value) {
-    exercisesStore.fetchExercises({});
+const fetchExercises = debounce((offset = query.offset) => {
+  query.offset = offset;
+  if (searchExercise.value) {
+    selectedBodyParts.value = '';
+    exercisesStore.getExercisesByName(searchExercise.value, query);
+  } else if (selectedBodyParts.value) {
+    exercisesStore.getExercisesByName(selectedBodyParts.value, query);
   } else {
-    exercisesStore.getExercisesByName(value);
+    exercisesStore.fetchExercises(query);
+  }
+});
+
+watch(selectedBodyParts, () => {
+  searchExercise.value = '';
+  query.offset = 0;
+  fetchExercises();
+});
+
+
+
+const handleScroll = (event: Event) => {
+  const target = event.target as HTMLElement;
+  if (target.scrollTop + target.clientHeight >= target.scrollHeight - 100) {
+    fetchExercises(query.offset + 1);
   }
 }
 
-watch(selectedBodyParts, (newValue: number | undefined) => {
-  if (typeof newValue === 'undefined') {
-    exercisesStore.fetchExercises({});
+const saveExercises = (type: 'superset' | 'single'): void => {
+  if (type === 'single') {
+    emits('save-exercises', exercises.value);
   } else {
-    exercisesStore.getExercisesByBodyPart(exercisesStore.bodyParts[newValue]);
+    emits('create-superset', exercises.value);
   }
-});
+  exercises.value.clear();
+}
 
 </script>
 
@@ -38,7 +64,7 @@ watch(selectedBodyParts, (newValue: number | undefined) => {
       :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event)"
   >
-    <v-card max-width="800" class="align-self-center">
+    <v-card max-width="800" class="align-self-center" @scroll="handleScroll">
       <div class="d-flex align-center justify-space-between px-4 py-4">
         <v-card-title>Упражнения</v-card-title>
         <v-btn icon="$plus" title="Создать упражнение" variant="outlined" color="secondary" />
@@ -47,7 +73,7 @@ watch(selectedBodyParts, (newValue: number | undefined) => {
         <v-text-field
             v-model="searchExercise"
             append-inner-icon="mdi-magnify"
-            @update:model-value="handleSearchExercises"
+            @update:model-value="fetchExercises"
         />
 
         <v-chip-group
@@ -88,7 +114,7 @@ watch(selectedBodyParts, (newValue: number | undefined) => {
             v-if="exercises.size > 1"
             variant="outlined"
             color="primary"
-            @click="$emit('create-superset', exercises)"
+            @click="saveExercises('superset')"
         >
           Создать суперсет
         </v-btn>
@@ -96,7 +122,7 @@ watch(selectedBodyParts, (newValue: number | undefined) => {
             color="primary"
             variant="flat"
             :disabled="exercises.size === 0"
-            @click="$emit('save-exercises', exercises)"
+            @click="saveExercises('single')"
         >
           Установить ({{ exercises.size }})
         </v-btn>
