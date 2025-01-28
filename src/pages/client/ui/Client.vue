@@ -6,8 +6,7 @@ import { onMounted, computed } from 'vue';
 const clientStore = useClientStore();
 const route = useRoute();
 
-const clientId = computed(() => route.params.id);
-
+const clientId = computed<number>(() => Number(route.params.id));
 
 onMounted(() => {
   clientStore.getClient(clientId.value);

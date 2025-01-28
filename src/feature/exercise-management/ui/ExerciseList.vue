@@ -63,7 +63,7 @@ const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) 
                         :exercise="exercise"
                         :index="exerciseIndex"
                         class="ga-2"
-                        @delete="() => deleteExercise(group, exercise, exerciseIndex)"
+                        @delete="() => deleteExercise(group, exerciseIndex)"
                         @delete-repeat="(repeatIndex) => deleteRepeatFromExercise(exercise, repeatIndex)"
                         @add-repeat="() => addRepeatToExercise(exercise)"
                     />

@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { Client } from '@/shared/types';
 import { useClientStore } from '../model/clientStore.ts';
 
-const props = defineProps<{ modelValue: boolean }>();
+defineProps<{ modelValue: boolean }>();
 const emits = defineEmits<{(e: 'update:modelValue', client: Client): void
 }>();
 
@@ -50,7 +50,7 @@ const resetNewClientFields  = () => {
 
         <v-text-field
             label="Email"
-          v-model="newClient.email"
+            v-model="newClient.email"
             type="email"
         />
 

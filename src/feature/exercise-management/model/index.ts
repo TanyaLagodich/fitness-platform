@@ -1,6 +1,6 @@
 import {defineStore} from "pinia";
 import { ref } from 'vue';
-import {Exercise, ExerciseInWorkout} from "@/shared/types";
+import { Exercise, ExerciseInWorkout, ExerciseTypes } from "@/shared/types";
 
 export const useExerciseManagementStore = defineStore('exercise-management', () => {
     const exercises = ref<ExerciseInWorkout[]>([]);
@@ -13,16 +13,16 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
                     repeats: [],
                 }
             ],
-            type: 'single',
+            type: ExerciseTypes.Single,
         }));
 
         exercises.value = [...exercises.value, ...mappedExercises];
     };
 
-    const deleteExercise = (group, exercise: ExerciseInWorkout, index: number) => {
-        if (group.type === 'single') {
+    const deleteExercise = (group: ExerciseInWorkout, index: number) => {
+        if (group.type === ExerciseTypes.Single) {
             exercises.value.splice(index, 1);
-        } else if (group.type === 'superset') {
+        } else if (group.type === ExerciseTypes.Superset) {
             group.exercises.splice(index, 1);
             if (group.exercises.length === 0) {
                 // TODO find group in exercises and remove it
@@ -33,7 +33,7 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
 
     const addSuperset = (newExercises: Exercise[]) => {
         const superSet = {
-            type: 'superset',
+            type: ExerciseTypes.Superset,
             exercises: [...newExercises].map((exercise) => ({
                 ...exercise,
                 repeats: [],

@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch } from 'vue';
 import { Exercise, useExercisesStore } from "@/entities/exercise";
 import type { Exercise as TypeExercise } from '@/shared/types';
-import { debounce } from '@/shared/lib';
 
 defineProps<{ modelValue: boolean }>();
 const emits = defineEmits<{
@@ -17,36 +16,28 @@ const searchExercise = ref<string>('');
 const selectedBodyParts = ref<string | undefined>(undefined);
 const exercises = ref(new Set());
 const query = {
-  limit: 20,
+  limit: 10,
   offset: 0,
 }
 
-const fetchExercises = debounce((offset = query.offset) => {
-  query.offset = offset;
-  if (searchExercise.value) {
-    selectedBodyParts.value = '';
-    exercisesStore.getExercisesByName(searchExercise.value, query);
-  } else if (selectedBodyParts.value) {
-    exercisesStore.getExercisesByName(selectedBodyParts.value, query);
-  } else {
-    exercisesStore.fetchExercises(query);
-  }
-});
+const fetchExercises = async (offset = query.offset) => {
+    query.offset = offset;
+
+    if (searchExercise.value) {
+      selectedBodyParts.value = '';
+      await exercisesStore.getExercisesByName(searchExercise.value, query);
+    } else if (selectedBodyParts.value) {
+      await exercisesStore.getExercisesByName(selectedBodyParts.value, query);
+    } else {
+      await exercisesStore.fetchExercises(query);
+    }
+};
 
 watch(selectedBodyParts, () => {
   searchExercise.value = '';
   query.offset = 0;
   fetchExercises();
 });
-
-
-
-const handleScroll = (event: Event) => {
-  const target = event.target as HTMLElement;
-  if (target.scrollTop + target.clientHeight >= target.scrollHeight - 100) {
-    fetchExercises(query.offset + 1);
-  }
-}
 
 const saveExercises = (type: 'superset' | 'single'): void => {
   if (type === 'single') {
@@ -57,6 +48,18 @@ const saveExercises = (type: 'superset' | 'single'): void => {
   exercises.value.clear();
 }
 
+const loadMoreExercises = async ({ done }) => {
+  try {
+    done('loading');
+
+    const prevExercisesLength = exercisesStore.exercises.length;
+    const newOffset = query.offset + query.limit;
+    await fetchExercises(newOffset);
+    done(prevExercisesLength === exercisesStore.exercises.length ? 'empty' : 'ok');
+  } catch {
+    done('error');
+  }
+};
 </script>
 
 <template>
@@ -64,7 +67,7 @@ const saveExercises = (type: 'superset' | 'single'): void => {
       :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event)"
   >
-    <v-card max-width="800" class="align-self-center" @scroll="handleScroll">
+    <v-card max-width="800" class="align-self-center">
       <div class="d-flex align-center justify-space-between px-4 py-4">
         <v-card-title>Упражнения</v-card-title>
         <v-btn icon="$plus" title="Создать упражнение" variant="outlined" color="secondary" />
@@ -72,6 +75,7 @@ const saveExercises = (type: 'superset' | 'single'): void => {
       <v-card-text>
         <v-text-field
             v-model="searchExercise"
+            label="Введите название упражнение на английском"
             append-inner-icon="mdi-magnify"
             @update:model-value="fetchExercises"
         />
@@ -87,24 +91,32 @@ const saveExercises = (type: 'superset' | 'single'): void => {
               :text="bodyPart"
           />
         </v-chip-group>
-        <v-row>
-          <v-col
+        <v-infinite-scroll
+          :height="400"
+          color="primary"
+          class="d-flex flex-row flex-wrap justify-center pb-2"
+          @load="loadMoreExercises"
+        >
+          <template
               v-for="exercise in exercisesStore.exercises"
               :key="exercise.id"
-              class="d-flex child-flex"
-              cols="4"
           >
-            <exercise :exercise="exercise">
-              <template #actions>
-                <!--                  <v-btn icon="$edit" />-->
-                <v-btn
-                    :icon="exercises.has(exercise) ? '$delete' : '$plus'"
-                    @click="exercises.has(exercise) ? exercises.delete(exercise) : exercises.add(exercise)"
-                />
-              </template>
-            </exercise>
-          </v-col>
-        </v-row>
+            <v-col
+                class="d-flex child-flex"
+                cols="4"
+            >
+              <exercise :exercise="exercise">
+                <template #actions>
+                  <!--                  <v-btn icon="$edit" />-->
+                  <v-btn
+                      :icon="exercises.has(exercise) ? '$delete' : '$plus'"
+                      @click="exercises.has(exercise) ? exercises.delete(exercise) : exercises.add(exercise)"
+                  />
+                </template>
+              </exercise>
+            </v-col>
+          </template>
+        </v-infinite-scroll>
       </v-card-text>
 
       <v-card-actions
@@ -130,3 +142,9 @@ const saveExercises = (type: 'superset' | 'single'): void => {
     </v-card>
   </v-dialog>
 </template>
+
+<style lang="scss">
+  .v-infinite-scroll__side {
+    padding: 0;
+  }
+</style>

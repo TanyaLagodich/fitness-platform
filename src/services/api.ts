@@ -10,7 +10,7 @@ export const getClients = async (search = '') => {
     return response.data;
 };
 
-export const addClient = async (client: { name: string; notes: string }) => {
+export const addClient = async (client: Client) => {
     const response = await api.post(`/clients`, client);
     return response.data;
 };

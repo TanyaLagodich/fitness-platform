@@ -9,10 +9,14 @@ defineProps<{ exercise: Exercise }>();
   <v-card
       class="mx-auto"
       max-width="344"
-      :title="exercise.name"
       :hover="true"
       width="100%"
   >
+    <v-card-text
+      class="text-h6"
+    >
+      {{ exercise.name }}
+    </v-card-text>
     <v-img
         height="200px"
         :src="exercise.gifUrl"

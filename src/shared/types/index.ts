@@ -16,9 +16,13 @@ export interface Exercise {
     instructions: string[];
 }
 
+export enum ExerciseTypes {
+    Single,
+    Superset,
+}
 
 export interface ExerciseInWorkout {
-    type: 'single' | 'superset';
+    type: ExerciseTypes;
     exercises: ExerciseWithRepeats[];
 }
 
@@ -51,4 +55,10 @@ export interface Plan {
     description: string;
     exercises: (Exercise | Superset)[];
     name: string;
+}
+
+// TODO find a better place for this interface
+export interface QueryParams {
+    limit: number;
+    offset: number;
 }

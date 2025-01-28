@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Exercise } from '@shared/types';
+import { Exercise } from '@/shared/types';
 
 const api = axios.create({
     baseURL: 'https://exercisedb.p.rapidapi.com/',
