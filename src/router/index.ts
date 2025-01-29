@@ -16,12 +16,12 @@ const routes = [
                 component: Clients,
             },
             {
-                path: '/clients/:id',
+                path: '/client/:id',
                 name: 'client',
                 component: Client,
             },
             {
-                path: '/clients/:id/workout/new',
+                path: '/client/:id/workout/new',
                 name: 'add-workout',
                 component: AddWorkout,
             },

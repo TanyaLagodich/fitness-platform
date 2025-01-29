@@ -1,8 +1,9 @@
 export interface Client {
-    id?: number;
+    _id?: number;
     name: string;
     email: string;
     notes?: string;
+    photo?: string;
 }
 
 export interface Exercise {
