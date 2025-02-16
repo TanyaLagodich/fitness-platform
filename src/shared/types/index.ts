@@ -1,5 +1,5 @@
 export interface Client {
-    _id?: number;
+    _id?: string;
     name: string;
     email: string;
     notes?: string;
@@ -7,14 +7,13 @@ export interface Client {
 }
 
 export interface Exercise {
-    bodyPart: string;
-    equipment: string;
-    gifUrl: string;
-    id: string;
+    _id?: string;
     name: string;
-    target: string;
-    secondaryMuscles: string[];
-    instructions: string[];
+    description?: string;
+    bodyParts: string[];
+    equipments: string[];
+    tags: string[];
+    videoUrl?: string;
 }
 
 export enum ExerciseTypes {
@@ -62,4 +61,10 @@ export interface Plan {
 export interface QueryParams {
     limit: number;
     offset: number;
+}
+
+export interface ExerciseMetaData {
+    bodyParts: string[];
+    equipments: string[];
+    tags: string[];
 }

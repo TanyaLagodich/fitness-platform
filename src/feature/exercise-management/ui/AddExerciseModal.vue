@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { Exercise, useExercisesStore } from "@/entities/exercise";
+import { ref } from 'vue';
 import type { Exercise as TypeExercise } from '@/shared/types';
+import { NewExercise } from '@/feature/exercise-management';
+import {ExistedExercises} from "@/feature/exercise-management/ui/existed-exercises";
+import {useExercisesApi} from "@/shared/api";
 
 defineProps<{ modelValue: boolean }>();
 const emits = defineEmits<{
@@ -10,56 +12,25 @@ const emits = defineEmits<{
   (e: 'save-exercises', exercises: TypeExercise[]): void,
 }>();
 
-const exercisesStore = useExercisesStore();
 
-const searchExercise = ref<string>('');
-const selectedBodyParts = ref<string | undefined>(undefined);
+const filtersOpen = ref(false);
+
+const tab = ref<'existed' | 'new'>('existed');
+
 const exercises = ref(new Set());
-const query = {
-  limit: 10,
-  offset: 0,
+
+// const saveExercises = (type: 'superset' | 'single'): void => {
+//   if (type === 'single') {
+//     emits('save-exercises', exercises.value);
+//   } else {
+//     emits('create-superset', exercises.value);
+//   }
+//   exercises.value.clear();
+// }
+
+const updateExistedExercises = () => {
+  tab.value = 'existed';
 }
-
-const fetchExercises = async (offset = query.offset) => {
-    query.offset = offset;
-
-    if (searchExercise.value) {
-      selectedBodyParts.value = '';
-      await exercisesStore.getExercisesByName(searchExercise.value, query);
-    } else if (selectedBodyParts.value) {
-      await exercisesStore.getExercisesByName(selectedBodyParts.value, query);
-    } else {
-      await exercisesStore.fetchExercises(query);
-    }
-};
-
-watch(selectedBodyParts, () => {
-  searchExercise.value = '';
-  query.offset = 0;
-  fetchExercises();
-});
-
-const saveExercises = (type: 'superset' | 'single'): void => {
-  if (type === 'single') {
-    emits('save-exercises', exercises.value);
-  } else {
-    emits('create-superset', exercises.value);
-  }
-  exercises.value.clear();
-}
-
-const loadMoreExercises = async ({ done }) => {
-  try {
-    done('loading');
-
-    const prevExercisesLength = exercisesStore.exercises.length;
-    const newOffset = query.offset + query.limit;
-    await fetchExercises(newOffset);
-    done(prevExercisesLength === exercisesStore.exercises.length ? 'empty' : 'ok');
-  } catch {
-    done('error');
-  }
-};
 </script>
 
 <template>
@@ -67,56 +38,39 @@ const loadMoreExercises = async ({ done }) => {
       :model-value="modelValue"
       @update:model-value="$emit('update:modelValue', $event)"
   >
-    <v-card max-width="800" class="align-self-center">
-      <div class="d-flex align-center justify-space-between px-4 py-4">
-        <v-card-title>Упражнения</v-card-title>
-        <v-btn icon="$plus" title="Создать упражнение" variant="outlined" color="secondary" />
-      </div>
-      <v-card-text>
-        <v-text-field
-            v-model="searchExercise"
-            label="Введите название упражнение на английском"
-            append-inner-icon="mdi-magnify"
-            @update:model-value="fetchExercises"
-        />
+    <v-card
+        max-width="800"
+        min-width="800"
+        class="align-self-center"
+    >
+      <v-overlay
+          v-model="filtersOpen"
+          :contained="true"
+          @click="filtersOpen = false"
+      />
+      <v-tabs
+          v-model="tab"
+          bg-color="primary"
+      >
+        <v-tab value="existed">Выбрать из базы</v-tab>
+        <v-tab value="new">Создать новое упражнение</v-tab>
+      </v-tabs>
 
-        <v-chip-group
-            v-model="selectedBodyParts"
-            selected-class="text-primary"
-            :column="true"
-        >
-          <v-chip
-              v-for="bodyPart in exercisesStore.bodyParts"
-              :key="bodyPart"
-              :text="bodyPart"
-          />
-        </v-chip-group>
-        <v-infinite-scroll
-          :height="400"
-          color="primary"
-          class="d-flex flex-row flex-wrap justify-center pb-2"
-          @load="loadMoreExercises"
-        >
-          <template
-              v-for="exercise in exercisesStore.exercises"
-              :key="exercise.id"
-          >
-            <v-col
-                class="d-flex child-flex"
-                cols="4"
-            >
-              <exercise :exercise="exercise">
-                <template #actions>
-                  <!--                  <v-btn icon="$edit" />-->
-                  <v-btn
-                      :icon="exercises.has(exercise) ? '$delete' : '$plus'"
-                      @click="exercises.has(exercise) ? exercises.delete(exercise) : exercises.add(exercise)"
-                  />
-                </template>
-              </exercise>
-            </v-col>
-          </template>
-        </v-infinite-scroll>
+      <v-card-text>
+        <v-tabs-window v-model="tab">
+          <v-tabs-window-item value="existed">
+            <existed-exercises
+                :filters-open="filtersOpen"
+                @toggle-filters="filtersOpen = !filtersOpen"
+            />
+          </v-tabs-window-item>
+
+          <v-tabs-window-item value="new">
+            <new-exercise
+              @go-to-existed-tab="updateExistedExercises"
+            />
+          </v-tabs-window-item>
+        </v-tabs-window>
       </v-card-text>
 
       <v-card-actions

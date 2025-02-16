@@ -1,9 +1,17 @@
 import {defineStore} from "pinia";
 import { ref } from 'vue';
-import { Exercise, ExerciseInWorkout, ExerciseTypes } from "@/shared/types";
+import {Exercise, ExerciseInWorkout, ExerciseMetaData, ExerciseTypes} from "@/shared/types";
+import { useExercisesApi } from "@/shared/api";
 
 export const useExerciseManagementStore = defineStore('exercise-management', () => {
     const exercises = ref<ExerciseInWorkout[]>([]);
+    const exerciseMetaData = ref<ExerciseMetaData>({
+        bodyParts: [],
+        tags: [],
+        equipments: [],
+    });
+
+    const exerciseApi = useExercisesApi();
 
     const addExercises = (newExercises: Exercise[]) => {
         const mappedExercises: ExerciseInWorkout[] = [...newExercises].map((exercise) => ({
@@ -43,10 +51,20 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
         exercises.value = [...exercises.value, superSet];
     }
 
+    const fetchExerciseMetaData = async () => {
+        const data = await exerciseApi.getMetaDataOfExercises();
+        exerciseMetaData.value.bodyParts = data?.bodyParts;
+        exerciseMetaData.value.tags = data?.tags;
+        exerciseMetaData.value.equipments = data?.equipments;
+        console.log(exerciseMetaData.value);
+    }
+
     return {
         exercises,
+        exerciseMetaData,
         addExercises,
         deleteExercise,
         addSuperset,
+        fetchExerciseMetaData,
     }
 });

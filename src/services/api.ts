@@ -24,7 +24,7 @@ export const deleteClient = async (id: number) => {
     await api.delete(`/clients/${id}`);
 };
 
-export const getClientById = async (id: number): Promise<Client> => {
+export const getClientById = async (id: string): Promise<Client> => {
     const { data } =  await api.get(`/clients/${id}`);
     return data;
 }

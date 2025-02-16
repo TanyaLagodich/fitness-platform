@@ -10,7 +10,7 @@ const clientStore = useClientStore();
 const exerciseManagementStore = useExerciseManagementStore();
 
 const route = useRoute();
-const clientId = computed<number>(() => Number(route.params.id));
+const clientId = computed<string>(() => route.params.id);
 
 const workout = ref({
 
@@ -19,7 +19,7 @@ const workout = ref({
 const isAddExerciseModalShown = ref<boolean>(false);
 
 onMounted(() => {
-  if (clientStore.client?.id !== clientId.value) {
+  if (clientStore.client?._id !== clientId.value) {
     clientStore.getClient(clientId.value);
   }
 });

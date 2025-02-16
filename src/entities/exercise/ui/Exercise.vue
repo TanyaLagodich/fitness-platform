@@ -1,7 +1,16 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
 import { Exercise } from "@/shared/types";
 
-defineProps<{ exercise: Exercise }>();
+const props = defineProps<{ exercise: Exercise }>();
+
+const extractYouTubeVideoId = (url: string): string | null => {
+  const regex = /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|shorts\/)([^"&?/\s]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+};
+
+const videoUrl = computed(() => `https://img.youtube.com/vi/${extractYouTubeVideoId(props.exercise.videoUrl)}/maxresdefault.jpg`)
 
 </script>
 
@@ -16,14 +25,16 @@ defineProps<{ exercise: Exercise }>();
       class="text-h6"
     >
       {{ exercise.name }}
-    </v-card-text>
-    <v-img
-        height="200px"
-        :src="exercise.gifUrl"
-    />
 
-    <v-card-actions class="justify-end">
-      <slot name="actions" />
-    </v-card-actions>
+      <div>
+        <img
+            :src="videoUrl"
+            :alt="exercise.description || exercise.name"
+            aspect-ratio="1/1"
+            width="100%"
+            height="100%"
+        />
+      </div>
+    </v-card-text>
   </v-card>
 </template>
