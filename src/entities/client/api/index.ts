@@ -14,9 +14,7 @@ export const fetchClients = async (): Promise<Client[]> => {
 
 export const createClient = async (client: Omit<Client, 'id'>): Promise<Client> => {
     try {
-        console.log('Adding client:', client);
         const docRef = await addDoc(clientCollection, client);
-        console.log('Document added with ID:', docRef.id);
         return { id: docRef.id, ...client };
     } catch (error) {
         console.error('Error adding document:', error);

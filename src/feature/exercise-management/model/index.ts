@@ -56,7 +56,6 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
         exerciseMetaData.value.bodyParts = data?.bodyParts;
         exerciseMetaData.value.tags = data?.tags;
         exerciseMetaData.value.equipments = data?.equipments;
-        console.log(exerciseMetaData.value);
     }
 
     return {
