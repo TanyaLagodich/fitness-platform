@@ -24,12 +24,12 @@ onMounted(() => {
   }
 });
 
-const saveExercises = (exercises: Exercise[]) => {
+const saveExercises = (exercises: Map<string, Exercise>) => {
   exerciseManagementStore.addExercises(exercises);
   isAddExerciseModalShown.value = false;
 }
 
-const createSuperset = (exercises: Exercise[]) => {
+const createSuperset = (exercises: Map<string, Exercise>) => {
   exerciseManagementStore.addSuperset(exercises);
   isAddExerciseModalShown.value = false;
 }

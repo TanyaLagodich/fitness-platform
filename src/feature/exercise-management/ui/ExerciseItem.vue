@@ -20,12 +20,16 @@ const time = ref<boolean>(false);
 </script>
 
 <template>
-  <v-expansion-panel>
+  <v-expansion-panel :id="exercise._id">
     <template #title>
       <v-row class="align-center">
+        <v-icon
+          icon="mdi-drag"
+          class="drag-handle"
+        />
         <h4>{{ index + 1 }}</h4>
         <v-col cols="1">
-          <v-img :src="exercise.gifUrl" />
+          <v-img :src="exercise.thumbnailUrl" />
         </v-col>
         <v-col>
           <h3>{{ exercise.name }}</h3>

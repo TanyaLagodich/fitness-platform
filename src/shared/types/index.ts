@@ -14,11 +14,12 @@ export interface Exercise {
     equipments: string[];
     tags: string[];
     videoUrl?: string;
+    thumbnailUrl?: string;
 }
 
 export enum ExerciseTypes {
-    Single,
-    Superset,
+    Single= 'Single',
+    Superset = 'Superset',
 }
 
 export interface ExerciseInWorkout {

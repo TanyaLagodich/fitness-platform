@@ -13,16 +13,18 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
 
     const exerciseApi = useExercisesApi();
 
-    const addExercises = (newExercises: Exercise[]) => {
-        const mappedExercises: ExerciseInWorkout[] = [...newExercises].map((exercise) => ({
-            exercises: [
-                {
+    const addExercises = (newExercises: Map<string, Exercise>) => {
+        const mappedExercises: ExerciseInWorkout[] = [...newExercises].map(([ id, exercise ]) => {
+           return {
+               exercises: [
+                   {
                     ...exercise,
                     repeats: [],
+                    id,
                 }
             ],
-            type: ExerciseTypes.Single,
-        }));
+           type: ExerciseTypes.Single,
+        }});
 
         exercises.value = [...exercises.value, ...mappedExercises];
     };
@@ -39,14 +41,18 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
         }
     }
 
-    const addSuperset = (newExercises: Exercise[]) => {
+    const addSuperset = (newExercises: Map<string, Exercise>) => {
+        console.log('addSuperset', newExercises);
         const superSet = {
             type: ExerciseTypes.Superset,
-            exercises: [...newExercises].map((exercise) => ({
+            exercises: [...newExercises].map(([id, exercise]) => ({
                 ...exercise,
                 repeats: [],
+                id,
             })),
         };
+
+        console.log({ superSet });
 
         exercises.value = [...exercises.value, superSet];
     }

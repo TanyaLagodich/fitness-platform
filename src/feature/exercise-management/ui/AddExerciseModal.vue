@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Exercise as TypeExercise } from '@/shared/types';
+import type {Exercise, Exercise as TypeExercise} from '@/shared/types';
 import { NewExercise } from '@/feature/exercise-management';
 import {ExistedExercises} from "@/feature/exercise-management/ui/existed-exercises";
-import {useExercisesApi} from "@/shared/api";
 
 defineProps<{ modelValue: boolean }>();
 const emits = defineEmits<{
   (e: 'update:modelValue', modelValue: boolean): void,
-  (e: 'create-superset', exercises: TypeExercise[]): void,
-  (e: 'save-exercises', exercises: TypeExercise[]): void,
+  (e: 'create-superset', exercises: Map<string, Exercise>): void,
+  (e: 'save-exercises', exercises: Map<string, Exercise>): void,
 }>();
 
 
@@ -17,16 +16,16 @@ const filtersOpen = ref(false);
 
 const tab = ref<'existed' | 'new'>('existed');
 
-const exercises = ref(new Set());
+const exercises = ref<Map<string, Exercise>>(new Map());
 
-// const saveExercises = (type: 'superset' | 'single'): void => {
-//   if (type === 'single') {
-//     emits('save-exercises', exercises.value);
-//   } else {
-//     emits('create-superset', exercises.value);
-//   }
-//   exercises.value.clear();
-// }
+const saveExercises = (type: 'superset' | 'single'): void => {
+  if (type === 'single') {
+    emits('save-exercises', exercises.value);
+  } else {
+    emits('create-superset', exercises.value);
+  }
+  exercises.value.clear();
+}
 
 const updateExistedExercises = () => {
   tab.value = 'existed';
@@ -60,6 +59,7 @@ const updateExistedExercises = () => {
         <v-tabs-window v-model="tab">
           <v-tabs-window-item value="existed">
             <existed-exercises
+                v-model="exercises"
                 :filters-open="filtersOpen"
                 @toggle-filters="filtersOpen = !filtersOpen"
             />

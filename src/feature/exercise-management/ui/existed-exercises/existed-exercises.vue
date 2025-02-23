@@ -8,6 +8,7 @@ import { useExerciseManagementStore } from "@/feature/exercise-management";
 const props = defineProps<{ filtersOpen: boolean }>();
 const emits = defineEmits<{
   (e: 'toggleFilters'): void;
+  (e: 'update:model-value', exercise: Map<string, TypeExercise>): void;
 }>();
 
 const exerciseApi = useExercisesApi();
@@ -19,6 +20,7 @@ const selectedBodyParts = ref<string[]>([]);
 const selectedEquipments = ref<string[]>([]);
 const selectedTags = ref<string[]>([]);
 const exercises = ref<TypeExercise[]>([]);
+const selectedExercise = ref<Map<string, TypeExercise>>(new Map());
 
 /** Фильтры для запроса */
 const filterParams = ref({
@@ -54,6 +56,16 @@ const resetFilters = () => {
   applyFilters();
 };
 
+const toggleExercise = (exercise: TypeExercise) => {
+  if (selectedExercise.value.has(exercise._id as string)) {
+    selectedExercise.value.delete(exercise._id as string);
+  } else {
+    selectedExercise.value.set(exercise._id as string, exercise);
+  }
+
+  emits('update:model-value', selectedExercise.value);
+}
+
 /** Следим за изменением поиска и автоматически обновляем список */
 watch(searchQuery, () => {
   filterParams.value.search = searchQuery.value;
@@ -71,7 +83,6 @@ onMounted(() => {
 <template>
   <v-row class="mb-2 align-center justify-space-between">
     <v-col cols="9">
-      <!-- Поле поиска -->
       <v-text-field
           v-model="searchQuery"
           label="Введите название упражнения"
@@ -81,7 +92,6 @@ onMounted(() => {
       />
     </v-col>
     <v-col cols="3" class="d-flex justify-end">
-      <!-- Кнопка фильтров -->
       <v-btn
           variant="outlined"
           color="primary"
@@ -93,7 +103,6 @@ onMounted(() => {
     </v-col>
   </v-row>
 
-  <!-- Фильтры -->
   <v-expand-transition>
     <v-card v-if="props.filtersOpen" class="filter-panel pa-4" elevation="4">
       <v-row>
@@ -140,7 +149,6 @@ onMounted(() => {
     </v-card>
   </v-expand-transition>
 
-  <!-- Список упражнений -->
   <div v-if="exercises.length"
        class="d-flex flex-wrap ga-2"
   >
@@ -148,6 +156,8 @@ onMounted(() => {
         v-for="exercise in exercises"
         :key="exercise._id"
         :exercise="exercise"
+        :selected="selectedExercise.has(exercise._id as string)"
+        @click="() => toggleExercise(exercise)"
     />
   </div>
   <v-empty-state

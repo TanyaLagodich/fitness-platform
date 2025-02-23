@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
 import {useExerciseManagementStore} from "@/feature/exercise-management/model";
-import {ExerciseInWorkout, ExerciseWithRepeats} from "@/shared/types";
+import {ExerciseInWorkout, ExerciseTypes, ExerciseWithRepeats} from "@/shared/types";
 import ExerciseItem from "@/feature/exercise-management/ui/ExerciseItem.vue";
 
 const exerciseManagementStore = useExerciseManagementStore();
@@ -23,6 +23,23 @@ const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) 
   exercise.repeats.splice(index, 1);
 }
 
+const handleMoveExercise = () => {
+  exerciseManagementStore.exercises = exerciseManagementStore.exercises.map((item: ExerciseWithRepeats | ExerciseInWorkout) => {
+    if (!item.type) {
+      return {
+        type: ExerciseTypes.Single,
+        exercises: [item],
+      };
+    }
+
+    return {
+      type: item.exercises.length > 1 ? ExerciseTypes.Superset : ExerciseTypes.Single,
+      exercises: [...item.exercises],
+    }
+  })
+
+  exerciseManagementStore.exercises = exerciseManagementStore.exercises.filter(group => group.exercises.length !== 0);
+}
 </script>
 
 <template>
@@ -38,8 +55,12 @@ const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) 
       />
       <template v-else>
         <draggable
-          v-model="exerciseManagementStore.exercises"
+          :model-value="exerciseManagementStore.exercises"
+          :list="exerciseManagementStore.exercises"
           item-key="id"
+          group="exercise"
+          handle=".drag-handle"
+          @end="handleMoveExercise"
         >
           <template #item="{ element: group, index }">
             <v-card
@@ -48,15 +69,20 @@ const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) 
             >
               <template #title>
                 <h4>
+                  <v-icon icon="mdi-drag" class="drag-handle" />
                   {{ index + 1 }}
-                  {{ group.type === 'superset' ? 'Супер-сет' : '' }}
+                  {{ group.type === ExerciseTypes.Superset ? 'Супер-сет' : '' }}
                 </h4>
               </template>
               <v-expansion-panels>
                 <draggable
-                    v-model="group.exercises"
+                    :model-value="group.exercises"
+                    :list="group.exercises"
                     item-key="id"
                     class="w-100"
+                    group="exercise"
+                    handle=".drag-handle"
+                    @end="handleMoveExercise"
                 >
                   <template #item="{ element: exercise, index: exerciseIndex }">
                     <exercise-item
@@ -77,21 +103,10 @@ const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) 
     </v-card-text>
   </v-card>
 </template>
-<style scoped lang="scss">
+<style lang="scss">
   .exercise-card {
-    transition: all 0.3s ease-in-out;
-
-    &.dragging {
-      opacity: 0.5;
-      transform: scale(0.95);
+    .drag-handle:hover {
+      cursor: grab;
     }
-  }
-
-  .placeholder {
-    height: 60px;
-    background-color: rgb(var(--v-theme-blue-grey));
-    border: 2px dashed rgb(var(--v-theme-primary));
-    border-radius: 4px;
-    margin-bottom: 10px;
   }
 </style>
