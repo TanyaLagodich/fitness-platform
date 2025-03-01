@@ -4,7 +4,8 @@ import { computed, onMounted, ref } from 'vue';
 import { VDateInput } from 'vuetify/labs/VDateInput';
 import { useClientStore } from '@/entities/client';
 import {AddExerciseModal, ExerciseList, useExerciseManagementStore} from "@/feature/exercise-management";
-import { Exercise } from '@/shared/types';
+import { Exercise, type Workout } from '@/shared/types';
+import {useWorkoutsApi} from "@/shared/api/workouts";
 
 const clientStore = useClientStore();
 const exerciseManagementStore = useExerciseManagementStore();
@@ -12,8 +13,10 @@ const exerciseManagementStore = useExerciseManagementStore();
 const route = useRoute();
 const clientId = computed<string>(() => route.params.id);
 
-const workout = ref({
-
+const workout = ref<Workout>({
+  name: '',
+  trainerId: '1',
+  exercises: exerciseManagementStore.exercises,
 });
 
 const isAddExerciseModalShown = ref<boolean>(false);
@@ -32,6 +35,11 @@ const saveExercises = (exercises: Map<string, Exercise>) => {
 const createSuperset = (exercises: Map<string, Exercise>) => {
   exerciseManagementStore.addSuperset(exercises);
   isAddExerciseModalShown.value = false;
+}
+
+const saveWorkout = async () => {
+  const workoutApi = useWorkoutsApi();
+  workoutApi.saveWorkout(workout.value);
 }
 </script>
 
@@ -101,4 +109,21 @@ const createSuperset = (exercises: Map<string, Exercise>) => {
       @save-exercises="saveExercises"
     />
   </v-card>
+  <v-fab
+      v-show="exerciseManagementStore.exercises.length"
+      icon="mdi-content-save-outline"
+      color="primary"
+      class="fab-save"
+      :absolute="true"
+      @click="saveExercises"
+  />
 </template>
+
+<style lang="scss" scoped>
+.fab-save {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1100;
+}
+</style>

@@ -42,20 +42,15 @@ export interface Repeat {
     weight: number;
 }
 
-interface Superset {
-    id: string;
-    type: 'superset';
+export interface Workout {
     name: string;
-    exercises: Exercise[];
-    repeats: number;
-}
-
-export interface Plan {
-    dateEnd: string;
-    dateStart: string;
-    description: string;
-    exercises: (Exercise | Superset)[];
-    name: string;
+    description?: string;
+    clientId?: string;
+    trainerId: string;
+    date?: Date;
+    frequency?: string;
+    exercises: ExerciseInWorkout[];
+    createdAt: Date;
 }
 
 // TODO find a better place for this interface
