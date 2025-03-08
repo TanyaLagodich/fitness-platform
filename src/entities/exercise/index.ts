@@ -1,6 +1,4 @@
-export {
-    getExercises,
-} from './api';
+export { getExercises } from './api';
 
 export { useExercisesStore } from './model';
 

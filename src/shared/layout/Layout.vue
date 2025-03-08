@@ -14,18 +14,14 @@ const items = ref([
     value: 'exercise',
     link: true,
     name: 'exercise',
-  }
-])
-
+  },
+]);
 </script>
 
 <template>
   <v-app>
     <v-layout>
-      <v-app-bar
-          color="primary"
-          prominent
-      >
+      <v-app-bar color="primary" prominent>
         <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
         <v-toolbar-title>ProTrainers</v-toolbar-title>
@@ -42,17 +38,17 @@ const items = ref([
       </v-app-bar>
 
       <v-navigation-drawer
-          v-model="drawer"
-          :location="$vuetify.display.mobile ? 'bottom' : undefined"
-          :class="{ 'position-fixed': $vuetify.display.mobile }"
-          :temporary="true"
+        v-model="drawer"
+        :location="$vuetify.display.mobile ? 'bottom' : undefined"
+        :class="{ 'position-fixed': $vuetify.display.mobile }"
+        :temporary="true"
       >
         <v-list-item
-            v-for="(item, i) in items"
-            :key="i"
-            :link="true"
-            :title="item.title"
-            :to="{ name: item.value }"
+          v-for="(item, i) in items"
+          :key="i"
+          :link="true"
+          :title="item.title"
+          :to="{ name: item.value }"
         />
       </v-navigation-drawer>
 

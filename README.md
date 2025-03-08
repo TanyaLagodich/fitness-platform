@@ -4,6 +4,5 @@ This template should help get you started developing with Vue 3 and TypeScript i
 
 Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
 
-
 How to deploy to FireBase
 https://firebase.google.com/docs/hosting/quickstart?hl=en&authuser=0&_gl=1*12zx8as*_ga*MTY0ODIxNTUxLjE3MzMwNTkyMzM.*_ga_CW55HF8NVT*MTczMzA1OTIzMy4xLjEuMTczMzA1OTk5MC42MC4wLjA.

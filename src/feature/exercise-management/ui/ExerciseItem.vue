@@ -8,9 +8,9 @@ defineProps<{
 }>();
 
 defineEmits<{
-  (e: 'delete'): void,
-  (e: 'add-repeat'): void,
-  (e: 'delete-repeat', index: number): void,
+  (e: 'delete'): void;
+  (e: 'add-repeat'): void;
+  (e: 'delete-repeat', index: number): void;
 }>();
 
 const counts = ref<boolean>(true);
@@ -23,10 +23,7 @@ const time = ref<boolean>(false);
   <v-expansion-panel :id="exercise._id">
     <template #title>
       <v-row class="align-center">
-        <v-icon
-          icon="mdi-drag"
-          class="drag-handle"
-        />
+        <v-icon icon="mdi-drag" class="drag-handle" />
         <h4>{{ index + 1 }}</h4>
         <v-col cols="1">
           <v-img :src="exercise.thumbnailUrl" />
@@ -36,54 +33,32 @@ const time = ref<boolean>(false);
           <p>{{ exercise.repeats.length }} подходов</p>
         </v-col>
         <v-col class="flex-grow-0">
-          <v-btn
-              icon="$delete"
-              class="mr-4"
-              variant="text"
-              @click.stop="$emit('delete')"
-          />
+          <v-btn icon="$delete" class="mr-4" variant="text" @click.stop="$emit('delete')" />
         </v-col>
       </v-row>
     </template>
 
     <template #text>
       <div class="d-flex align-center ga-2">
-        <v-checkbox
-            v-model="counts"
-            label="Повторения"
-        />
-        <v-checkbox
-            v-model="time"
-            label="Время"
-        />
-        <v-checkbox
-            v-model="weights"
-            label="Вес"
-        />
-        <v-checkbox
-            v-model="distance"
-            label="Расстояние"
-        />
+        <v-checkbox v-model="counts" label="Повторения" />
+        <v-checkbox v-model="time" label="Время" />
+        <v-checkbox v-model="weights" label="Вес" />
+        <v-checkbox v-model="distance" label="Расстояние" />
       </div>
       <v-expansion-panels>
-        <v-expansion-panel
-            v-for="(repeat, repeatIndex) in exercise.repeats"
-            :key="repeatIndex"
-        >
+        <v-expansion-panel v-for="(repeat, repeatIndex) in exercise.repeats" :key="repeatIndex">
           <template #title>
-            <div
-                class="d-flex align-center justify-center flex-grow-1 ga-4"
-            >
+            <div class="d-flex align-center justify-center flex-grow-1 ga-4">
               <h5>{{ repeatIndex + 1 }}</h5>
               <v-text-field
-                  v-if="counts"
-                  v-model="repeat.count"
-                  label="Повторения"
-                  type="number"
-                  class="flex-grow-1"
-                  :min="0"
-                  :hide-details="true"
-                  @click.stop
+                v-if="counts"
+                v-model="repeat.count"
+                label="Повторения"
+                type="number"
+                class="flex-grow-1"
+                :min="0"
+                :hide-details="true"
+                @click.stop
               />
               <v-text-field
                 v-if="time"
@@ -95,14 +70,14 @@ const time = ref<boolean>(false);
                 @click.stop
               />
               <v-text-field
-                  v-if="weights"
-                  v-model="repeat.weight"
-                  type="number"
-                  class="flex-grow-1"
-                  label="Вес (кг)"
-                  :min="0"
-                  :hide-details="true"
-                  @click.stop
+                v-if="weights"
+                v-model="repeat.weight"
+                type="number"
+                class="flex-grow-1"
+                label="Вес (кг)"
+                :min="0"
+                :hide-details="true"
+                @click.stop
               />
               <v-text-field
                 v-if="distance"
@@ -115,36 +90,31 @@ const time = ref<boolean>(false);
                 @click.stop
               />
               <v-select
-                  v-model="repeat.rpe"
-                  label="RPE"
-                  :items="rpeItems"
-                  :hide-details="true"
-                  @click.stop
+                v-model="repeat.rpe"
+                label="RPE"
+                :items="rpeItems"
+                :hide-details="true"
+                @click.stop
               />
 
               <v-btn
-                  icon="$delete"
-                  class="mr-4"
-                  variant="text"
-                  @click.stop="$emit('delete-repeat', repeatIndex)"
+                icon="$delete"
+                class="mr-4"
+                variant="text"
+                @click.stop="$emit('delete-repeat', repeatIndex)"
               />
             </div>
           </template>
           <template #text>
             <v-textarea
-                v-model="repeat.notes"
-                label="Комментарий для подхода"
-                :hide-details="true"
+              v-model="repeat.notes"
+              label="Комментарий для подхода"
+              :hide-details="true"
             />
           </template>
         </v-expansion-panel>
       </v-expansion-panels>
-      <v-btn
-          class="mt-4"
-          @click="$emit('add-repeat')"
-      >
-        Добавить подход
-      </v-btn>
+      <v-btn class="mt-4" @click="$emit('add-repeat')"> Добавить подход </v-btn>
     </template>
   </v-expansion-panel>
 </template>

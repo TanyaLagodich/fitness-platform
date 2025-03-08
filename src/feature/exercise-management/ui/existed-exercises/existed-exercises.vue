@@ -2,8 +2,8 @@
 import { ref, watch, onMounted, defineProps, defineEmits } from 'vue';
 import { useExercisesApi } from '@/shared/api';
 import { Exercise as TypeExercise } from '@/shared/types';
-import { Exercise } from "@/entities/exercise";
-import { useExerciseManagementStore } from "@/feature/exercise-management";
+import { Exercise } from '@/entities/exercise';
+import { useExerciseManagementStore } from '@/feature/exercise-management';
 
 const props = defineProps<{ filtersOpen: boolean }>();
 const emits = defineEmits<{
@@ -64,7 +64,7 @@ const toggleExercise = (exercise: TypeExercise) => {
   }
 
   emits('update:model-value', selectedExercise.value);
-}
+};
 
 /** Следим за изменением поиска и автоматически обновляем список */
 watch(searchQuery, () => {
@@ -73,10 +73,7 @@ watch(searchQuery, () => {
 });
 
 onMounted(() => {
-  Promise.all([
-    fetchExercises(),
-    exerciseManagementStore.fetchExerciseMetaData(),
-  ]);
+  Promise.all([fetchExercises(), exerciseManagementStore.fetchExerciseMetaData()]);
 });
 </script>
 
@@ -84,19 +81,19 @@ onMounted(() => {
   <v-row class="mb-2 align-center justify-space-between">
     <v-col cols="9">
       <v-text-field
-          v-model="searchQuery"
-          label="Введите название упражнения"
-          append-inner-icon="mdi-magnify"
-          clearable
-          hide-details
+        v-model="searchQuery"
+        label="Введите название упражнения"
+        append-inner-icon="mdi-magnify"
+        clearable
+        hide-details
       />
     </v-col>
     <v-col cols="3" class="d-flex justify-end">
       <v-btn
-          variant="outlined"
-          color="primary"
-          prepend-icon="mdi-filter"
-          @click="emits('toggleFilters')"
+        variant="outlined"
+        color="primary"
+        prepend-icon="mdi-filter"
+        @click="emits('toggleFilters')"
       >
         Фильтры
       </v-btn>
@@ -108,35 +105,35 @@ onMounted(() => {
       <v-row>
         <v-col cols="4">
           <v-combobox
-              v-model="selectedBodyParts"
-              :items="exerciseMetaData.bodyParts"
-              label="Части тела"
-              :multiple="true"
-              :clearable="true"
-              :chips="true"
-              :closable-chips="true"
+            v-model="selectedBodyParts"
+            :items="exerciseMetaData.bodyParts"
+            label="Части тела"
+            :multiple="true"
+            :clearable="true"
+            :chips="true"
+            :closable-chips="true"
           />
         </v-col>
         <v-col cols="4">
           <v-combobox
-              v-model="selectedEquipments"
-              :items="exerciseMetaData.equipments"
-              label="Оборудование"
-              :multiple="true"
-              :clearable="true"
-              :chips="true"
-              :closable-chips="true"
+            v-model="selectedEquipments"
+            :items="exerciseMetaData.equipments"
+            label="Оборудование"
+            :multiple="true"
+            :clearable="true"
+            :chips="true"
+            :closable-chips="true"
           />
         </v-col>
         <v-col cols="4">
           <v-combobox
-              v-model="selectedTags"
-              :items="exerciseMetaData.tags"
-              label="Теги"
-              :multiple="true"
-              :clearable="true"
-              :chips="true"
-              :closable-chips="true"
+            v-model="selectedTags"
+            :items="exerciseMetaData.tags"
+            label="Теги"
+            :multiple="true"
+            :clearable="true"
+            :chips="true"
+            :closable-chips="true"
           />
         </v-col>
       </v-row>
@@ -149,22 +146,16 @@ onMounted(() => {
     </v-card>
   </v-expand-transition>
 
-  <div v-if="exercises.length"
-       class="d-flex flex-wrap ga-2"
-  >
+  <div v-if="exercises.length" class="d-flex flex-wrap ga-2">
     <exercise
-        v-for="exercise in exercises"
-        :key="exercise._id"
-        :exercise="exercise"
-        :selected="selectedExercise.has(exercise._id as string)"
-        @click="() => toggleExercise(exercise)"
+      v-for="exercise in exercises"
+      :key="exercise._id"
+      :exercise="exercise"
+      :selected="selectedExercise.has(exercise._id as string)"
+      @click="() => toggleExercise(exercise)"
     />
   </div>
-  <v-empty-state
-    v-else
-    icon="mdi-alert"
-    headline="Упражнений не найдено"
-  />
+  <v-empty-state v-else icon="mdi-alert" headline="Упражнений не найдено" />
 </template>
 
 <style scoped>

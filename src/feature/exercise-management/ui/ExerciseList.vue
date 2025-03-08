@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import draggable from 'vuedraggable'
-import {useExerciseManagementStore} from "@/feature/exercise-management/model";
-import {ExerciseInWorkout, ExerciseTypes, ExerciseWithRepeats} from "@/shared/types";
-import ExerciseItem from "@/feature/exercise-management/ui/ExerciseItem.vue";
+import draggable from 'vuedraggable';
+import { useExerciseManagementStore } from '@/feature/exercise-management/model';
+import { ExerciseInWorkout, ExerciseTypes, ExerciseWithRepeats } from '@/shared/types';
+import ExerciseItem from '@/feature/exercise-management/ui/ExerciseItem.vue';
 
 const exerciseManagementStore = useExerciseManagementStore();
 const { deleteExercise } = exerciseManagementStore;
@@ -17,29 +17,33 @@ const addRepeatToExercise = (exercise: ExerciseWithRepeats) => {
       rpe: 0,
     });
   }
-}
+};
 
 const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) => {
   exercise.repeats.splice(index, 1);
-}
+};
 
 const handleMoveExercise = () => {
-  exerciseManagementStore.exercises = exerciseManagementStore.exercises.map((item: ExerciseWithRepeats | ExerciseInWorkout) => {
-    if (!item.type) {
+  exerciseManagementStore.exercises = exerciseManagementStore.exercises.map(
+    (item: ExerciseWithRepeats | ExerciseInWorkout) => {
+      if (!item.type) {
+        return {
+          type: ExerciseTypes.Single,
+          exercises: [item],
+        };
+      }
+
       return {
-        type: ExerciseTypes.Single,
-        exercises: [item],
+        type: item.exercises.length > 1 ? ExerciseTypes.Superset : ExerciseTypes.Single,
+        exercises: [...item.exercises],
       };
     }
+  );
 
-    return {
-      type: item.exercises.length > 1 ? ExerciseTypes.Superset : ExerciseTypes.Single,
-      exercises: [...item.exercises],
-    }
-  })
-
-  exerciseManagementStore.exercises = exerciseManagementStore.exercises.filter(group => group.exercises.length !== 0);
-}
+  exerciseManagementStore.exercises = exerciseManagementStore.exercises.filter(
+    (group) => group.exercises.length !== 0
+  );
+};
 </script>
 
 <template>
@@ -50,8 +54,8 @@ const handleMoveExercise = () => {
     </div>
     <v-card-text>
       <v-empty-state
-          v-if="!exerciseManagementStore.exercises.length"
-          text="Нет добавленных упражнений"
+        v-if="!exerciseManagementStore.exercises.length"
+        text="Нет добавленных упражнений"
       />
       <template v-else>
         <draggable
@@ -63,10 +67,7 @@ const handleMoveExercise = () => {
           @end="handleMoveExercise"
         >
           <template #item="{ element: group, index }">
-            <v-card
-                variant="elevated"
-                class="exercise-card px-4 py-4 my-4"
-            >
+            <v-card variant="elevated" class="exercise-card px-4 py-4 my-4">
               <template #title>
                 <h4>
                   <v-icon icon="mdi-drag" class="drag-handle" />
@@ -76,22 +77,24 @@ const handleMoveExercise = () => {
               </template>
               <v-expansion-panels>
                 <draggable
-                    :model-value="group.exercises"
-                    :list="group.exercises"
-                    item-key="id"
-                    class="w-100"
-                    group="exercise"
-                    handle=".drag-handle"
-                    @end="handleMoveExercise"
+                  :model-value="group.exercises"
+                  :list="group.exercises"
+                  item-key="id"
+                  class="w-100"
+                  group="exercise"
+                  handle=".drag-handle"
+                  @end="handleMoveExercise"
                 >
                   <template #item="{ element: exercise, index: exerciseIndex }">
                     <exercise-item
-                        :exercise="exercise"
-                        :index="exerciseIndex"
-                        class="ga-2"
-                        @delete="() => deleteExercise(group, exerciseIndex)"
-                        @delete-repeat="(repeatIndex) => deleteRepeatFromExercise(exercise, repeatIndex)"
-                        @add-repeat="() => addRepeatToExercise(exercise)"
+                      :exercise="exercise"
+                      :index="exerciseIndex"
+                      class="ga-2"
+                      @delete="() => deleteExercise(group, exerciseIndex)"
+                      @delete-repeat="
+                        (repeatIndex) => deleteRepeatFromExercise(exercise, repeatIndex)
+                      "
+                      @add-repeat="() => addRepeatToExercise(exercise)"
                     />
                   </template>
                 </draggable>
@@ -104,9 +107,9 @@ const handleMoveExercise = () => {
   </v-card>
 </template>
 <style lang="scss">
-  .exercise-card {
-    .drag-handle:hover {
-      cursor: grab;
-    }
+.exercise-card {
+  .drag-handle:hover {
+    cursor: grab;
   }
+}
 </style>

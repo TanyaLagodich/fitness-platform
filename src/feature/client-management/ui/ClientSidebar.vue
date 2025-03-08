@@ -7,14 +7,8 @@ import AddClientModal from './AddClientModal.vue';
 const emits = defineEmits<{ (e: 'update:modelValue', client: Client): void }>();
 const props = defineProps<{ modelValue: Client | null }>();
 
-const {
-  search,
-  isLoading,
-  filteredClients,
-  filterClients,
-  clients,
-  addNewClient,
-} = useClientStore();
+const { search, isLoading, filteredClients, filterClients, clients, addNewClient } =
+  useClientStore();
 
 const showAddClientModal = ref<boolean>(false);
 const drawer = ref<boolean>(true);
@@ -30,34 +24,18 @@ const toggleSidebar = () => {
 </script>
 
 <template>
-  <el-aside
-      :width="isSidebarCollapsed ? '50px' : '300px'"
-      class="sidebar"
-  >
-
-    <el-drawer
-        v-model="drawer"
-        direction="ltr"
-        :append-to-body="true"
-    >
+  <el-aside :width="isSidebarCollapsed ? '50px' : '300px'" class="sidebar">
+    <el-drawer v-model="drawer" direction="ltr" :append-to-body="true">
       <!-- Поиск -->
-      <el-input
-          v-model="search"
-          placeholder="Search clients"
-          clearable
-          @input="filterClients"
-      />
+      <el-input v-model="search" placeholder="Search clients" clearable @input="filterClients" />
 
       <!-- Список клиентов -->
-      <el-menu
-          default-active="2"
-          class="clients-list"
-      >
+      <el-menu default-active="2" class="clients-list">
         <el-menu-item
-            v-for="(client, index) in clients"
-            :key="client.id"
-            :index="index"
-            @click="emits('update:modelValue', client)"
+          v-for="(client, index) in clients"
+          :key="client.id"
+          :index="index"
+          @click="emits('update:modelValue', client)"
         >
           {{ client.name }}
         </el-menu-item>
@@ -65,26 +43,18 @@ const toggleSidebar = () => {
 
       <!-- Управление -->
       <div class="clients-list__controls">
-        <el-button
-            type="primary"
-            class="clients-list__add"
-            @click="showAddClientModal = true"
-        >
+        <el-button type="primary" class="clients-list__add" @click="showAddClientModal = true">
           Add New Client
         </el-button>
-        <el-button
-            type="danger"
-            :disabled="!props.modelValue"
-            class="clients-list__remove"
-        >
+        <el-button type="danger" :disabled="!props.modelValue" class="clients-list__remove">
           Remove Selected Client
         </el-button>
       </div>
 
       <AddClientModal
-          :model-value="showAddClientModal"
-          @update:model-value="showAddClientModal = $event"
-          @add-new-client="handleClientAdded"
+        :model-value="showAddClientModal"
+        @update:model-value="showAddClientModal = $event"
+        @add-new-client="handleClientAdded"
       />
     </el-drawer>
   </el-aside>

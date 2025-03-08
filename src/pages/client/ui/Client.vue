@@ -11,14 +11,10 @@ const clientId = computed<string>(() => route.params.id);
 onMounted(() => {
   clientStore.getClient(clientId.value);
 });
-
 </script>
 
 <template>
-  <v-card
-      v-if="clientStore.client"
-      min-height="100%"
-  >
+  <v-card v-if="clientStore.client" min-height="100%">
     <div class="d-flex align-center justify-space-between pr-2">
       <div>
         <v-card-title>
@@ -29,18 +25,15 @@ onMounted(() => {
         </v-card-subtitle>
       </div>
       <v-btn
-          type="primary"
-          prepend-icon="$plus"
-          :to="{ name: 'add-workout', params: { id: clientId } }"
+        type="primary"
+        prepend-icon="$plus"
+        :to="{ name: 'add-workout', params: { id: clientId } }"
       >
         Добавить тренировку
       </v-btn>
     </div>
     <v-card-text>
-      <v-empty-state
-          icon="$warning"
-          title="Нет назначенных тренировок для клиента"
-      />
+      <v-empty-state icon="$warning" title="Нет назначенных тренировок для клиента" />
     </v-card-text>
   </v-card>
 </template>

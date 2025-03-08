@@ -1,12 +1,10 @@
-<script setup lang="ts">
-
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <v-layout class="auth-layout d-flex align-center">
     <v-container class="fill-height d-flex flex-column justify-center align-center">
       <h1 class="app-title">ProFitness</h1>
-      <router-view/>
+      <router-view />
     </v-container>
   </v-layout>
 </template>
