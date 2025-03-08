@@ -1,13 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { Client } from 'shared/types';
+import { useNotificationStore } from '@/shared/store';
 
-
-const client = ref<Client | null>(null);
+const notificationStore = useNotificationStore();
 </script>
 
 <template>
   <router-view />
+
+  <v-snackbar
+      v-model="notificationStore.show"
+      color="error"
+      :timeout="notificationStore.TIMEOUT"
+  >
+    {{ notificationStore.message }}
+
+    <template v-slot:actions>
+      <v-btn
+          icon="mdi-close"
+          @click="() => notificationStore.toggle()"
+      />
+    </template>
+  </v-snackbar>
 </template>
 
 <style lang="scss" scoped>
