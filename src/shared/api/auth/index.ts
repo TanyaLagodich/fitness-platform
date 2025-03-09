@@ -11,7 +11,17 @@ export const useAuthApi = () => {
     }
   };
 
+  const login = async (data) => {
+    try {
+      const response: AxiosResponse<{}> = await api.post('/auth/login', data);
+      return response.data;
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return {
     registerNewCoach,
+    login,
   };
 };

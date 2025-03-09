@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useAuthApi } from '@/shared/api';
 
 const router = useRouter();
-
+const authApi = useAuthApi();
 const email = ref('');
 const password = ref('');
 const rememberMe = ref(false);
@@ -15,9 +16,9 @@ const signIn = async () => {
   errorMessage.value = '';
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    localStorage.setItem('token', 'fake-jwt-token');
-    router.push('/');
+    const data = await authApi.login({ email: email.value, password: password.value });
+    localStorage.setItem('token', data.token);
+    router.push('/home');
   } catch (error) {
     errorMessage.value = 'Ошибка входа. Проверьте данные и попробуйте снова.';
   } finally {
@@ -31,10 +32,6 @@ const signIn = async () => {
     <v-card-title class="text-h5 text-center">Вход в аккаунт</v-card-title>
 
     <v-card-text>
-      <v-alert v-if="errorMessage" type="error" dense class="mb-4">
-        {{ errorMessage }}
-      </v-alert>
-
       <v-text-field
         v-model="email"
         label="Email"

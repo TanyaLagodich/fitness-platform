@@ -43,3 +43,4 @@ export default api;
 export * from './exercises';
 export * from './workouts';
 export * from './auth';
+export * from './clients';
