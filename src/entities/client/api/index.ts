@@ -1,35 +1,36 @@
-import { collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { app } from '@/app/config/firebase';
+import api from '../index.ts';
 import { Client } from '@/shared/types';
 
-const db = getFirestore(app);
-const clientCollection = collection(db, 'clients');
+export const useClientsApi = () => {
+  const getClients = async (search = '') => {
+    const response = await api.get(`/clients`, { params: { search } });
+    return response.data;
+  };
 
-// Получение списка клиентов
-export const fetchClients = async (): Promise<Client[]> => {
-  const snapshot = await getDocs(clientCollection);
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as Client);
-};
+  const addClient = async (client: Client) => {
+    const response = await api.post(`/clients`, client);
+    return response.data;
+  };
 
-export const createClient = async (client: Omit<Client, 'id'>): Promise<Client> => {
-  try {
-    const docRef = await addDoc(clientCollection, client);
-    return { id: docRef.id, ...client };
-  } catch (error) {
-    console.error('Error adding document:', error);
-    throw error; // Проброс ошибки для отладки
-  }
-};
+  const updateClient = async (id: number, client: { name?: string; notes?: string }) => {
+    const response = await api.put(`/clients/${id}`, client);
+    return response.data;
+  };
 
-// Обновление клиента
-export const updateClient = async (id: string, client: Partial<Client>): Promise<void> => {
-  const docRef = doc(db, 'clients', id);
-  await updateDoc(docRef, client);
-};
+  const deleteClient = async (id: number) => {
+    await api.delete(`/clients/${id}`);
+  };
 
-// Удаление клиента
-export const deleteClient = async (id: string): Promise<void> => {
-  const docRef = doc(db, 'clients', id);
-  await deleteDoc(docRef);
+  const getClientById = async (id: string): Promise<Client> => {
+    const { data } = await api.get(`/clients/${id}`);
+    return data;
+  };
+
+  return {
+    getClients,
+    addClient,
+    updateClient,
+    deleteClient,
+    getClientById,
+  };
 };
