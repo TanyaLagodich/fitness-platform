@@ -152,7 +152,7 @@ onMounted(() => {
       :key="exercise._id"
       :exercise="exercise"
       :selected="selectedExercise.has(exercise._id as string)"
-      @click="() => toggleExercise(exercise)"
+      @toggle-exercise="(exercise) => toggleExercise(exercise)"
     />
   </div>
   <v-empty-state v-else icon="mdi-alert" headline="Упражнений не найдено" />

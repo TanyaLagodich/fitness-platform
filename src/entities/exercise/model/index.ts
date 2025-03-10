@@ -8,6 +8,17 @@ import {
 } from '../api';
 import { Exercise, QueryParams } from '@/shared/types';
 
+export interface Exercise {
+  _id?: string;
+  name: string;
+  description?: string;
+  bodyParts: string[];
+  equipments: string[];
+  tags: string[];
+  videoUrl?: string;
+  thumbnailUrl?: string;
+}
+
 export const useExercisesStore = defineStore('exercises', () => {
   const exercises = ref<Exercise[]>([]);
   const bodyParts = ref<string[]>([]);

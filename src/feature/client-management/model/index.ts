@@ -1,6 +1,42 @@
 import { ref, onMounted } from 'vue';
+import { defineStore } from 'pinia';
 import type { Client } from '@/entities/client';
 import { useClientsApi } from '@/shared/api';
+
+export const useClientModel = defineStore('client', () => {
+  const clients = ref<Client[]>([]);
+  const clientsApi = useClientsApi();
+
+  const getAllClients = async () => {
+    const data = await clientsApi.getClients();
+    clients.value = data;
+  };
+
+  const getClientById = async (id: string) => {
+    const data = await clientsApi.getClientById(id);
+    return data;
+  };
+
+  const addNewClient = async (client: Client) => {
+    await clientsApi.addClient(client);
+    await getAllClients();
+  };
+
+  return {
+    clients,
+    getAllClients,
+    getClientById,
+    addNewClient,
+  };
+
+  // const getClient = async (id: string) => {
+  //   try {
+  //     client.value = await clientsApi.getClientById(id);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+});
 
 export function useClientStore() {
   const search = ref<string>('');
@@ -32,7 +68,7 @@ export function useClientStore() {
     await clientsApi.getClientById(id);
   };
 
-  onMounted(fetchClients);
+  // onMounted(fetchClients);
 
   return {
     search,
@@ -45,8 +81,6 @@ export function useClientStore() {
     getClient,
   };
 }
-
-
 
 // import { defineStore } from 'pinia';
 // import { ref } from 'vue';

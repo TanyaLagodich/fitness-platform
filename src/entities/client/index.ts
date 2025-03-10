@@ -1,1 +1,3 @@
-export { useClientStore } from './model';
+export type { Client } from './model';
+
+export * from './ui';

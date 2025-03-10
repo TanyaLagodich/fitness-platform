@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { AddClientModal, ClientList } from "@/feature/client-management";
+import { AddClientModal, ClientList } from '@/feature/client-management';
 
 const isAddClientModalVisible = ref<boolean>(false);
 

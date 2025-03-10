@@ -1,1 +1,1 @@
-export { default as AddWorkout } from './ui/Addworkout.vue';
+export * from './ui';

@@ -1,1 +1,1 @@
-export { default as ClientList } from './list.vue';
+export { default as ClientList } from './client-list.vue';

@@ -56,7 +56,10 @@ const updateExistedExercises = () => {
         </v-tabs-window>
       </v-card-text>
 
-      <v-card-actions class="position-sticky bottom-0 bg-white border-t-md justify-center">
+      <v-card-actions
+        v-if="exercises.size > 0"
+        class="position-sticky bottom-0 bg-white border-t-md justify-center"
+      >
         <v-btn
           v-if="exercises.size > 1"
           variant="outlined"

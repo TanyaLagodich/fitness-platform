@@ -1,7 +1,7 @@
 export interface Client {
-    _id?: string;
-    name: string;
-    email: string;
-    notes?: string;
-    photo?: string;
+  _id?: string;
+  name: string;
+  email: string;
+  notes?: string;
+  photo?: string;
 }

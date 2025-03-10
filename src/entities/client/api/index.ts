@@ -1,5 +1,5 @@
-import api from '../index.ts';
-import { Client } from '@/shared/types';
+import api from '@/shared/api';
+import { Client } from '../model';
 
 export const useClientsApi = () => {
   const getClients = async (search = '') => {

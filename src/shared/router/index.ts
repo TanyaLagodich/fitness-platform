@@ -1,9 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Layout from '@/shared/layout/Layout.vue';
-import Clients from '@/pages/clients/ui/Clients.vue';
-import { Client } from '@/pages/client';
-import { AddWorkout } from '@/pages/add-workout';
-import { AuthLayout, SignUp, SignIn } from '@/pages/auth';
+import ClientList from '../../pages/clients/ui/client-list/client-list.vue';
+import { Client } from '../../pages/clients/client';
+import { AddWorkout } from '../../pages/workout';
+import { AuthLayout, SignUp, SignIn } from '@/pages/auth/index.ts';
 
 const routes = [
   {
@@ -24,7 +24,7 @@ const routes = [
       {
         path: '/clients',
         name: 'clients',
-        component: Clients,
+        component: ClientList,
       },
       {
         path: '/client/:id',
@@ -33,7 +33,7 @@ const routes = [
       },
       {
         path: '/client/:id/workout/new',
-        name: 'add-workout',
+        name: 'workout',
         component: AddWorkout,
       },
       {
