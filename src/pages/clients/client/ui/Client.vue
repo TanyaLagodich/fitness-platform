@@ -12,9 +12,14 @@ const route = useRoute();
 const clientId = computed<string>(() => route.params.id);
 const client = ref<Client | null>(null);
 
+const workouts = ref([]);
+
 onMounted(async () => {
   client.value = await clientModel.getClientById(clientId.value);
   workoutModel.setClient(client.value);
+
+  workouts.value = await workoutModel.getWorkoutsForClient();
+  console.log(workouts.value);
 });
 </script>
 
@@ -38,7 +43,27 @@ onMounted(async () => {
       </v-btn>
     </div>
     <v-card-text>
-      <v-empty-state icon="$warning" title="Нет назначенных тренировок для клиента" />
+      <v-empty-state
+        v-if="!workouts.length"
+        icon="$warning"
+        title="Нет назначенных тренировок для клиента"
+      />
+      <v-list v-else class="mt-4">
+        <v-list-item v-for="workout in workouts" :key="workout._id">
+          <v-card>
+            <v-card-title>{{ workout.name }}</v-card-title>
+            <v-card-subtitle>{{ workout.date }}</v-card-subtitle>
+            <v-card-text>
+              {{ workout.description }}
+            </v-card-text>
+            <v-card-actions>
+              <v-btn @click="$router.push(`/clients/${route.params.id}/workout/${workout._id}`)"
+                >Открыть</v-btn
+              >
+            </v-card-actions>
+          </v-card>
+        </v-list-item>
+      </v-list>
     </v-card-text>
   </v-card>
 </template>

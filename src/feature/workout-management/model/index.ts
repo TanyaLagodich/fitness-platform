@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import type { Client } from '@/entities/client';
 import { Workout } from '@/entities/workout';
 import { Exercise, ExerciseInWorkout, ExerciseTypes, ExerciseWithRepeats } from '@/shared/types';
-import { useWorkoutsApi } from '@/shared/api/workouts';
+import { useWorkoutsApi } from '@/entities/workout';
 
 export const useWorkoutModel = defineStore('workout', () => {
   const client = ref<Client | null>(null);
@@ -13,11 +13,15 @@ export const useWorkoutModel = defineStore('workout', () => {
     description: '',
     clientId: client.value?._id || undefined,
     frequency: '',
-    exercises: [],
+    groups: [],
   });
+
+  const workoutApi = useWorkoutsApi();
 
   const setClient = (data: Client) => {
     client.value = data;
+
+    workout.value.clientId = data._id;
   };
 
   const addExercises = (newExercises: Map<string, Exercise>) => {
@@ -34,11 +38,10 @@ export const useWorkoutModel = defineStore('workout', () => {
       };
     });
 
-    workout.value.exercises = [...workout.value.exercises, ...mappedExercises];
+    workout.value.groups = [...workout.value.groups, ...mappedExercises];
   };
 
   const addSuperset = (newExercises: Map<string, Exercise>) => {
-    console.log('addSuperset', newExercises);
     const superSet = {
       type: ExerciseTypes.Superset,
       exercises: [...newExercises].map(([id, exercise]) => ({
@@ -48,26 +51,28 @@ export const useWorkoutModel = defineStore('workout', () => {
       })),
     };
 
-    console.log({ superSet });
-
-    workout.value.exercises = [...workout.value.exercises, superSet];
+    workout.value.groups = [...workout.value.groups, superSet];
   };
 
   const saveWorkout = async () => {
-    const workoutApi = useWorkoutsApi();
-    await workoutApi.saveWorkout(workout.value);
+    await workoutApi.saveWorkout({ ...workout.value });
   };
 
   const deleteExerciseFromWorkout = (group, groupIndex, exerciseIndex) => {
     if (group.exercises.length > 1) {
       group.exercises.splice(exerciseIndex, 1);
     } else {
-      workout.value.exercises.splice(groupIndex, 1);
+      workout.value.groups.splice(groupIndex, 1);
     }
   };
 
   const deleteRepeatFromExercise = (exercise: ExerciseWithRepeats, index: number) => {
     exercise.repeats.splice(index, 1);
+  };
+
+  const getWorkoutsForClient = async (): Promise<Workout[]> => {
+    const { data } = await workoutApi.getWorkoutsForClient(client.value._id);
+    return data;
   };
 
   return {
@@ -79,5 +84,6 @@ export const useWorkoutModel = defineStore('workout', () => {
     saveWorkout,
     deleteExerciseFromWorkout,
     deleteRepeatFromExercise,
+    getWorkoutsForClient,
   };
 });

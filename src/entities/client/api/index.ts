@@ -1,5 +1,6 @@
 import api from '@/shared/api';
 import { Client } from '../model';
+import { Workout } from '@/entities/workout';
 
 export const useClientsApi = () => {
   const getClients = async (search = '') => {

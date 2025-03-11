@@ -7,7 +7,7 @@ import { useWorkoutModel } from '@/feature/workout-management';
 const workoutModel = useWorkoutModel();
 const { deleteExerciseFromWorkout } = workoutModel;
 const handleMoveExercise = () => {
-  workoutModel.workout.exercises = exercises
+  workoutModel.workout.groups = exercises
     .map((item: ExerciseWithRepeats | ExerciseInWorkout) => {
       if (!item.type) {
         return {
@@ -49,14 +49,11 @@ const addRepeatToExercise = (exercise: ExerciseWithRepeats) => {
       <slot name="actions" />
     </div>
     <v-card-text>
-      <v-empty-state
-        v-if="!workoutModel.workout.exercises.length"
-        text="Нет добавленных упражнений"
-      />
+      <v-empty-state v-if="!workoutModel.workout.groups.length" text="Нет добавленных упражнений" />
       <template v-else>
         <draggable
-          :model-value="workoutModel.workout.exercises"
-          :list="exercises"
+          :model-value="workoutModel.workout.groups"
+          :list="groups"
           item-key="id"
           group="exercise"
           handle=".drag-handle"

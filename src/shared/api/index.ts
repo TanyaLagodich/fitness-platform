@@ -41,6 +41,5 @@ api.interceptors.response.use(
 export default api;
 
 export * from './exercises';
-export * from './workouts';
 export * from './auth';
 export * from '../../entities/client/api';

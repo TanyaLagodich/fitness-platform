@@ -6,5 +6,5 @@ export interface Workout {
   clientId?: string;
   date?: Date;
   frequency?: string;
-  exercises: ExerciseInWorkout[];
+  groups: ExerciseInWorkout[];
 }

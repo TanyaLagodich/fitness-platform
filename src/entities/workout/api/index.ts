@@ -10,7 +10,16 @@ export const useWorkoutsApi = () => {
     }
   };
 
+  const getWorkoutsForClient = async (clientId: string) => {
+    try {
+      return await api.get(`/workouts/client/${clientId}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return {
     saveWorkout,
+    getWorkoutsForClient,
   };
 };
