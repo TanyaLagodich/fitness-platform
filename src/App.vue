@@ -6,7 +6,6 @@ const notificationStore = useNotificationStore();
 
 <template>
   <router-view />
-
   <v-snackbar v-model="notificationStore.show" color="error" :timeout="notificationStore.TIMEOUT">
     {{ notificationStore.message }}
 

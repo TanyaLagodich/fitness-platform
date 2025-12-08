@@ -9,6 +9,7 @@ const emits = defineEmits<{
 }>();
 
 const clientModel = useClientModel();
+const errorMessage = ref('');
 
 const newClient = ref({
   name: '',
@@ -16,15 +17,31 @@ const newClient = ref({
   notes: '',
 });
 
-const addNewClient = () => {
-  clientModel.addNewClient(newClient.value);
+const resetForm = () => {
   newClient.value = {
     name: '',
     email: '',
     notes: '',
   };
+};
 
-  emits('update:model-value', false);
+const addNewClient = async () => {
+  try {
+    errorMessage.value = '';
+    await clientModel.addNewClient(newClient.value);
+    resetForm();
+    emits('update:model-value', false);
+  } catch (error: unknown) {
+    if (typeof error === 'object' && error !== null && 'response' in error) {
+      const axiosError = error as { response?: { data?: { error?: string; message?: string } } };
+      errorMessage.value =
+        axiosError.response?.data?.error ||
+        axiosError.response?.data?.message ||
+        'Не удалось создать клиента';
+    } else {
+      errorMessage.value = 'Не удалось создать клиента';
+    }
+  }
 };
 </script>
 
@@ -37,6 +54,15 @@ const addNewClient = () => {
         <v-text-field label="Email" v-model="newClient.email" type="email" />
 
         <v-textarea label="Заметки" v-model="newClient.notes" />
+        <v-alert
+          v-if="errorMessage"
+          type="error"
+          class="mb-4"
+          variant="tonal"
+          density="compact"
+        >
+          {{ errorMessage }}
+        </v-alert>
       </v-card-text>
 
       <v-divider></v-divider>

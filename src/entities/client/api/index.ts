@@ -4,7 +4,8 @@ import { Workout } from '@/entities/workout';
 
 export const useClientsApi = () => {
   const getClients = async (search = '') => {
-    const response = await api.get(`/clients`, { params: { search } });
+    const params = search ? { search } : undefined;
+    const response = await api.get(`/clients`, { params });
     return response.data;
   };
 

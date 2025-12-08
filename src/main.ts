@@ -16,6 +16,7 @@ const vuetify = createVuetify({
   },
 });
 
+
 const app = createApp(App).use(createPinia()).use(router).use(vuetify);
 
 app.mount('#app');

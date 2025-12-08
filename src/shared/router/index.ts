@@ -4,8 +4,13 @@ import ClientList from '../../pages/clients/ui/client-list/client-list.vue';
 import { Client } from '../../pages/clients/client';
 import { AddWorkout } from '../../pages/workout';
 import { AuthLayout, SignUp, SignIn } from '@/pages/auth/index.ts';
+import WorkoutDetails from '@/pages/workout/ui/workout-details/workout-details.vue';
 
 const routes = [
+  {
+    path: '/',
+    redirect: '/home',
+  },
   {
     path: '/auth',
     component: AuthLayout,
@@ -35,6 +40,12 @@ const routes = [
         path: '/client/:id/workout/new',
         name: 'workout',
         component: AddWorkout,
+      },
+      {
+        path: '/client/:id/workout/:workoutId',
+        name: 'workout-details',
+        component: WorkoutDetails,
+        props: true,
       },
       {
         path: '/exercise',
