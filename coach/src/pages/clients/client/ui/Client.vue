@@ -57,7 +57,7 @@ onMounted(async () => {
               {{ workout.description }}
             </v-card-text>
             <v-card-actions>
-              <v-btn @click="$router.push(`/clients/${route.params.id}/workout/${workout._id}`)"
+              <v-btn @click="$router.push(`/client/${route.params.id}/workout/${workout._id}`)"
                 >Открыть</v-btn
               >
             </v-card-actions>
