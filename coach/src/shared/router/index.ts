@@ -42,6 +42,11 @@ const routes = [
         component: AddWorkout,
       },
       {
+        path: '/client/:id/workout/:workoutId/edit',
+        name: 'workout-edit',
+        component: AddWorkout,
+      },
+      {
         path: '/client/:id/workout/:workoutId',
         name: 'workout-details',
         component: WorkoutDetails,

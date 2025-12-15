@@ -68,6 +68,13 @@ export const useWorkoutModel = defineStore('workout', () => {
     await workoutApi.saveWorkout({ ...workout.value });
   };
 
+  const updateWorkout = async () => {
+    if (!workout.value?._id) {
+      throw new Error('Workout id is missing');
+    }
+    await workoutApi.updateWorkout({ ...workout.value });
+  };
+
   const deleteExerciseFromWorkout = (
     group: ExerciseInWorkout,
     groupIndex: number,
@@ -123,7 +130,10 @@ export const useWorkoutModel = defineStore('workout', () => {
         ?.find((repeat) => typeof repeat.notes === 'string' && repeat.notes.trim().length)
         ?.notes ?? '';
     const repeats =
-      exercise.repeats?.map(({ notes: _repeatNotes, ...rest }) => rest) ?? [];
+      exercise.repeats?.map(({ notes, ...rest }) => {
+        void notes;
+        return rest;
+      }) ?? [];
 
     return {
       _id: resolveExerciseId(exercise),
@@ -140,6 +150,7 @@ export const useWorkoutModel = defineStore('workout', () => {
   };
 
   const normalizeWorkoutFromApi = (data: WorkoutFromApi): Workout => ({
+    _id: data._id,
     name: data.name ?? '',
     description: data.description,
     clientId: (data.clientId as string) ?? undefined,
@@ -165,6 +176,16 @@ export const useWorkoutModel = defineStore('workout', () => {
     return normalizedWorkouts;
   };
 
+  const getWorkoutById = async (workoutId: string): Promise<Workout> => {
+    const response = await workoutApi.getWorkoutById(workoutId);
+    const normalized = normalizeWorkoutFromApi(response?.data ?? {});
+    workout.value = normalized;
+    if (normalized.clientId) {
+      client.value = { ...(client.value as Client), _id: normalized.clientId } as Client;
+    }
+    return normalized;
+  };
+
   return {
     client,
     workout,
@@ -172,8 +193,10 @@ export const useWorkoutModel = defineStore('workout', () => {
     addExercises,
     addSuperset,
     saveWorkout,
+    updateWorkout,
     deleteExerciseFromWorkout,
     deleteRepeatFromExercise,
     getWorkoutsForClient,
+    getWorkoutById,
   };
 });

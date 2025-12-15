@@ -85,7 +85,12 @@ onMounted(loadWorkout);
           variant="tonal"
           prepend-icon="mdi-pencil"
           :disabled="!workout"
-          @click="$router.push({ name: 'workout', params: { id: clientId } })"
+          @click="
+            $router.push({
+              name: 'workout-edit',
+              params: { id: clientId, workoutId },
+            })
+          "
         >
           Редактировать
         </v-btn>

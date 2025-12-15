@@ -10,6 +10,23 @@ export const useWorkoutsApi = () => {
     }
   };
 
+  const updateWorkout = async (workout: Workout) => {
+    if (!workout._id) throw new Error('Workout id is required for update');
+    try {
+      return await api.put(`/workouts/${workout._id}`, workout);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const getWorkoutById = async (workoutId: string) => {
+    try {
+      return await api.get(`/workouts/${workoutId}`);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const getWorkoutsForClient = async (clientId: string) => {
     try {
       return await api.get(`/workouts/client/${clientId}`);
@@ -20,6 +37,8 @@ export const useWorkoutsApi = () => {
 
   return {
     saveWorkout,
+    updateWorkout,
+    getWorkoutById,
     getWorkoutsForClient,
   };
 };

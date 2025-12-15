@@ -1,4 +1,5 @@
 import axios from 'axios';
+import router from '@/shared/router';
 import { useNotificationStore } from '@/shared/store';
 
 const api = axios.create({
@@ -9,7 +10,6 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    console.log(token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,11 +23,13 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log('error');
     const notificationStore = useNotificationStore();
 
     if (error.response) {
-      if (error.response.status === 400) {
+      if (error.response.status === 401) {
+        localStorage.removeItem('token');
+        router.push('/auth/sign-in');
+      } else if (error.response.status === 400) {
         notificationStore.toggle(error.response.data.message || 'Ошибка запроса');
       }
     } else {
