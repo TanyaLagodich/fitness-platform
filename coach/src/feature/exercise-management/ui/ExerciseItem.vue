@@ -105,15 +105,14 @@ const time = ref<boolean>(false);
               />
             </div>
           </template>
-          <template #text>
-            <v-textarea
-              v-model="repeat.notes"
-              label="Комментарий для подхода"
-              :hide-details="true"
-            />
-          </template>
         </v-expansion-panel>
       </v-expansion-panels>
+      <v-textarea
+        v-model="exercise.notes"
+        label="Комментарий к упражнению"
+        class="mt-4"
+        :hide-details="true"
+      />
       <v-btn class="mt-4" @click="$emit('add-repeat')"> Добавить подход </v-btn>
     </template>
   </v-expansion-panel>

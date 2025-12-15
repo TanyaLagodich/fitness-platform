@@ -20,6 +20,7 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
           {
             ...exercise,
             repeats: [],
+            notes: '',
             id,
           },
         ],
@@ -49,6 +50,7 @@ export const useExerciseManagementStore = defineStore('exercise-management', () 
       exercises: [...newExercises].map(([id, exercise]) => ({
         ...exercise,
         repeats: [],
+        notes: '',
         id,
       })),
     };

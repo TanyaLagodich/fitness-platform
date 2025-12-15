@@ -21,6 +21,7 @@ export interface ExerciseInWorkout {
 
 export interface ExerciseWithRepeats extends Exercise {
   repeats: Repeat[];
+  notes?: string;
 }
 
 export interface Repeat {
@@ -32,6 +33,10 @@ export interface Repeat {
   stressMark: number;
   virtual: boolean;
   weight: number;
+  time?: string;
+  distance?: number;
+  rpe?: number;
+  notes?: string;
 }
 
 export interface Workout {

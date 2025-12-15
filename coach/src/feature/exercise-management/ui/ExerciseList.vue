@@ -13,7 +13,6 @@ const addRepeatToExercise = (exercise: ExerciseWithRepeats) => {
   } else {
     exercise.repeats.push({
       count: 0,
-      notes: '',
       rpe: 0,
     });
   }

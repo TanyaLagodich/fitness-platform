@@ -39,6 +39,7 @@ export const useWorkoutModel = defineStore('workout', () => {
           {
             ...exercise,
             repeats: [],
+            notes: '',
             id,
           },
         ],
@@ -55,6 +56,7 @@ export const useWorkoutModel = defineStore('workout', () => {
       exercises: [...newExercises].map(([id, exercise]) => ({
         ...exercise,
         repeats: [],
+        notes: '',
         id,
       })),
     };
@@ -116,6 +118,13 @@ export const useWorkoutModel = defineStore('workout', () => {
   const normalizeExerciseFromApi = (exercise: ExerciseFromApi): ExerciseWithRepeats => {
     const populated = getPopulatedExercise(exercise);
 
+    const repeatNotes =
+      exercise.repeats
+        ?.find((repeat) => typeof repeat.notes === 'string' && repeat.notes.trim().length)
+        ?.notes ?? '';
+    const repeats =
+      exercise.repeats?.map(({ notes: _repeatNotes, ...rest }) => rest) ?? [];
+
     return {
       _id: resolveExerciseId(exercise),
       name: populated?.name ?? exercise.name ?? '',
@@ -125,7 +134,8 @@ export const useWorkoutModel = defineStore('workout', () => {
       tags: populated?.tags ?? exercise.tags ?? [],
       videoUrl: populated?.videoUrl ?? exercise.videoUrl,
       thumbnailUrl: populated?.thumbnailUrl ?? exercise.thumbnailUrl,
-      repeats: exercise.repeats ?? [],
+      notes: exercise.notes ?? repeatNotes,
+      repeats,
     };
   };
 
