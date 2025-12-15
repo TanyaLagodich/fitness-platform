@@ -5,6 +5,7 @@ import { VDateInput } from 'vuetify/labs/VDateInput';
 import { AddExerciseModal } from '@/feature/exercise-management';
 import { useWorkoutModel } from '../../model';
 import { Exercise } from '@/shared/types';
+import type { Client } from '@/entities/client';
 import { ExerciseList } from '../exercise-list';
 import { useClientModel } from '@/feature/client-management';
 
@@ -16,8 +17,20 @@ const { addSuperset, addExercises, saveWorkout, updateWorkout, getWorkoutById } 
 const isAddExerciseModalShown = ref<boolean>(false);
 const isSaving = ref<boolean>(false);
 
+const clientId = computed(() => {
+  const id = route.params.id;
+  return Array.isArray(id) ? id[0] : (id as string | undefined);
+});
 const isEditMode = computed(() => Boolean(route.params.workoutId));
-const saveLabel = computed(() => (isEditMode.value ? 'Сохранить изменения' : 'Сохранить тренировку'));
+const pageTitle = computed(() => (isEditMode.value ? 'Редактировать тренировку' : 'Новая тренировка'));
+const selectedClientId = ref<string | undefined>();
+const selectedClient = computed<Client | null>(() => {
+  return (
+    clientModel.clients.find((client) => client._id === selectedClientId.value) ||
+    workoutModel.client ||
+    null
+  );
+});
 
 const saveExercises = (exercises: Map<string, Exercise>) => {
   addExercises(exercises);
@@ -30,13 +43,25 @@ const createSuperset = (exercises: Map<string, Exercise>) => {
 };
 
 onMounted(async () => {
-  if (route.params.id && !workoutModel.workout.clientId) {
-    const client = await clientModel.getClientById(route.params.id);
-    workoutModel.setClient(client.value);
+  await clientModel.getAllClients();
+
+  const workoutId = Array.isArray(route.params.workoutId)
+    ? route.params.workoutId[0]
+    : (route.params.workoutId as string | undefined);
+
+  if (isEditMode.value && workoutId) {
+    await getWorkoutById(workoutId);
   }
 
-  if (isEditMode.value && route.params.workoutId) {
-    await getWorkoutById(route.params.workoutId as string);
+  const initialClientId = workoutModel.workout.clientId ?? clientId.value;
+  if (initialClientId) {
+    selectedClientId.value = initialClientId;
+    const client =
+      clientModel.clients.find((item) => item._id === initialClientId) ??
+      (await clientModel.getClientById(initialClientId));
+    if (client) {
+      workoutModel.setClient(client);
+    }
   }
 });
 
@@ -48,11 +73,34 @@ const handleSave = async () => {
     } else {
       await saveWorkout();
     }
-    router.push({ name: 'client', params: { id: route.params.id } });
+    const targetId = selectedClientId.value ?? clientId.value;
+    router.push({ name: 'client', params: { id: targetId } });
   } catch (error) {
     console.error(error);
   } finally {
     isSaving.value = false;
+  }
+};
+
+const goBack = () => {
+  if (clientId.value) {
+    router.push({ name: 'client', params: { id: clientId.value } });
+  } else {
+    router.back();
+  }
+};
+
+const handleClientChange = async (id: string | null) => {
+  if (!id) return;
+  selectedClientId.value = id;
+  const client =
+    clientModel.clients.find((item) => item._id === id) ?? (await clientModel.getClientById(id));
+  if (client) {
+    workoutModel.setClient(client);
+    const targetRoute = isEditMode.value
+      ? { name: 'workout-edit', params: { id, workoutId: route.params.workoutId } }
+      : { name: 'workout', params: { id } };
+    router.replace(targetRoute);
   }
 };
 </script>
@@ -60,15 +108,46 @@ const handleSave = async () => {
 <template>
   <v-card v-if="workoutModel.client">
     <v-card-text>
+      <div class="d-flex align-center justify-space-between mb-4">
+        <div class="d-flex align-center ga-2">
+          <v-btn icon="mdi-arrow-left" variant="text" @click="goBack" />
+          <div class="text-h6 font-weight-medium">{{ pageTitle }}</div>
+        </div>
+        <v-chip v-if="isEditMode" color="primary" variant="tonal" size="small">Редактирование</v-chip>
+      </div>
       <p>Назначить для:</p>
-      <v-tooltip :text="workoutModel.client.name" location="bottom">
-        <template v-slot:activator="{ props }">
-          <v-avatar color="info" v-bind="props">
-            <v-icon icon="mdi-account-circle" />
-          </v-avatar>
-        </template>
-      </v-tooltip>
-      <v-btn icon="$edit" class="ml-2" />
+      <div class="d-flex align-center ga-3 mt-2">
+        <v-avatar color="info">
+          <v-icon icon="mdi-account-circle" />
+        </v-avatar>
+        <div class="d-flex align-center flex-grow-1 ga-2">
+          <div class="flex-grow-1">
+            <div class="text-subtitle-1 font-weight-medium">
+              {{ selectedClient?.name || 'Клиент не выбран' }}
+            </div>
+            <div class="text-body-2 text-medium-emphasis">
+              {{ selectedClient?.email || 'Выберите клиента для назначения' }}
+            </div>
+          </div>
+          <v-menu transition="fade-transition">
+            <template #activator="{ props }">
+              <v-btn icon="$edit" size="small" v-bind="props" />
+            </template>
+            <v-list>
+              <v-list-subheader>Сменить клиента</v-list-subheader>
+              <v-list-item
+                v-for="client in clientModel.clients"
+                :key="client._id"
+                :value="client._id"
+                @click="handleClientChange(client._id || null)"
+              >
+                <v-list-item-title>{{ client.name }}</v-list-item-title>
+                <v-list-item-subtitle v-if="client.email">{{ client.email }}</v-list-item-subtitle>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+        </div>
+      </div>
 
       <v-row class="mt-4">
         <v-col cols="6">
