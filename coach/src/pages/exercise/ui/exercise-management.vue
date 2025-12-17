@@ -5,9 +5,12 @@ import type { Exercise } from '@/shared/types';
 import ExerciseForm from '@/feature/exercise-management/ui/ExerciseForm.vue';
 import { useExerciseManagementStore } from '@/feature/exercise-management';
 import { getYoutubeThumbnail, getYoutubeEmbedUrl } from '@/shared/utils';
+import { useNotificationStore } from '@/shared/store';
+import ExercisePreview from './exercise-preview.vue';
 
 const exercisesApi = useExercisesApi();
 const exerciseManagementStore = useExerciseManagementStore();
+const notificationStore = useNotificationStore();
 
 const exercises = ref<Exercise[]>([]);
 const isLoading = ref(false);
@@ -19,17 +22,25 @@ const selectedEquipments = ref<string[]>([]);
 const selectedTags = ref<string[]>([]);
 const videoPreview = ref<{ open: boolean; url: string | null }>({ open: false, url: null });
 const debounceTimer = ref<number | null>(null);
+const page = ref(1);
+const perPage = 12;
+const preview = ref<{ open: boolean; exercise: Exercise | null }>({ open: false, exercise: null });
 
 const fetchExercises = async () => {
   isLoading.value = true;
-  exercises.value =
-    (await exercisesApi.getExercises({
-      search: search.value,
-      'bodyParts[]': selectedBodyParts.value,
-      'equipments[]': selectedEquipments.value,
-      'tags[]': selectedTags.value,
-    })) ?? [];
-  isLoading.value = false;
+  try {
+    exercises.value =
+      (await exercisesApi.getExercises({
+        search: search.value,
+        'bodyParts[]': selectedBodyParts.value,
+        'equipments[]': selectedEquipments.value,
+        'tags[]': selectedTags.value,
+      })) ?? [];
+  } catch {
+    notificationStore.toggle('Не удалось загрузить упражнения', 'error');
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 const openCreate = () => {
@@ -43,25 +54,47 @@ const openEdit = (exercise: Exercise) => {
 };
 
 const handleSave = async (exercise: Exercise) => {
-  if (exercise._id) {
-    await exercisesApi.updateExercise(exercise._id, exercise);
-  } else {
-    await exercisesApi.createExercise(exercise);
+  try {
+    if (exercise._id) {
+      await exercisesApi.updateExercise(exercise._id, exercise);
+      notificationStore.toggle('Упражнение обновлено', 'success');
+    } else {
+      await exercisesApi.createExercise(exercise);
+      notificationStore.toggle('Упражнение создано', 'success');
+    }
+    isFormOpen.value = false;
+    await fetchExercises();
+  } catch {
+    notificationStore.toggle('Не удалось сохранить упражнение', 'error');
   }
-  isFormOpen.value = false;
-  await fetchExercises();
 };
 
 const deleteExercise = async (exercise: Exercise) => {
   if (!exercise._id) return;
-  await exercisesApi.deleteExercise(exercise._id);
-  await fetchExercises();
+  const ok = window.confirm(`Удалить упражнение "${exercise.name}"?`);
+  if (!ok) return;
+  try {
+    await exercisesApi.deleteExercise(exercise._id);
+    notificationStore.toggle('Упражнение удалено', 'success');
+    await fetchExercises();
+  } catch {
+    notificationStore.toggle('Не удалось удалить упражнение', 'error');
+  }
 };
 
 const filteredExercises = computed(() => {
   if (!search.value) return exercises.value;
   const term = search.value.toLowerCase();
   return exercises.value.filter((item) => item.name.toLowerCase().includes(term));
+});
+
+const totalPages = computed(() =>
+  Math.max(1, Math.ceil(filteredExercises.value.length / perPage))
+);
+
+const pagedExercises = computed(() => {
+  const start = (page.value - 1) * perPage;
+  return filteredExercises.value.slice(start, start + perPage);
 });
 
 onMounted(async () => {
@@ -76,17 +109,12 @@ watch(
   }
 );
 
-const addMeta = async (type: 'bodyPart' | 'equipment' | 'tag') => {
-  const value = window.prompt('Введите название');
-  if (!value) return;
-  if (type === 'bodyPart') await exercisesApi.addBodyPart(value);
-  if (type === 'equipment') await exercisesApi.addEquipment(value);
-  if (type === 'tag') await exercisesApi.addTag(value);
-  await exerciseManagementStore.fetchExerciseMetaData();
-};
+watch(filteredExercises, () => {
+  page.value = 1;
+});
 
-const previewVideo = (url?: string) => {
-  videoPreview.value = { open: true, url: url ?? null };
+const openPreview = (exercise: Exercise) => {
+  preview.value = { open: true, exercise };
 };
 
 const getEmbedWithAutoplay = (url?: string) => {
@@ -131,14 +159,6 @@ const getEmbedWithAutoplay = (url?: string) => {
               @update:model-value="fetchExercises"
               @keydown.enter.prevent
             />
-            <v-btn
-              size="x-small"
-              variant="text"
-              prepend-icon="mdi-plus"
-              @click="() => addMeta('bodyPart')"
-            >
-              Добавить часть тела
-            </v-btn>
           </v-col>
           <v-col cols="12" md="4">
             <v-combobox
@@ -152,14 +172,6 @@ const getEmbedWithAutoplay = (url?: string) => {
               @update:model-value="fetchExercises"
               @keydown.enter.prevent
             />
-            <v-btn
-              size="x-small"
-              variant="text"
-              prepend-icon="mdi-plus"
-              @click="() => addMeta('equipment')"
-            >
-              Добавить оборудование
-            </v-btn>
           </v-col>
           <v-col cols="12" md="4">
             <v-combobox
@@ -173,9 +185,6 @@ const getEmbedWithAutoplay = (url?: string) => {
               @update:model-value="fetchExercises"
               @keydown.enter.prevent
             />
-            <v-btn size="x-small" variant="text" prepend-icon="mdi-plus" @click="() => addMeta('tag')">
-              Добавить тег
-            </v-btn>
           </v-col>
         </v-row>
 
@@ -190,10 +199,14 @@ const getEmbedWithAutoplay = (url?: string) => {
         />
 
         <v-row v-else dense>
-          <v-col v-for="exercise in filteredExercises" :key="exercise._id" cols="12" md="6" lg="4">
-            <v-card variant="outlined" class="exercise-card h-100">
+          <v-col v-for="exercise in pagedExercises" :key="exercise._id" cols="12" md="6" lg="4">
+              <v-card variant="outlined" class="exercise-card h-100">
               <v-hover v-slot="{ isHovering, props }">
-                <div v-bind="props" class="cursor-pointer preview-wrapper" @click="() => previewVideo(exercise.videoUrl)">
+                <div
+                  v-bind="props"
+                  class="cursor-pointer preview-wrapper"
+                  @click="() => openPreview(exercise)"
+                >
                   <template v-if="exercise.thumbnailUrl">
                     <v-img
                       :src="exercise.thumbnailUrl"
@@ -237,6 +250,15 @@ const getEmbedWithAutoplay = (url?: string) => {
             </v-card>
           </v-col>
         </v-row>
+
+        <div class="d-flex justify-center mt-4" v-if="totalPages > 1">
+          <v-pagination
+            v-model="page"
+            :length="totalPages"
+            :total-visible="7"
+            rounded
+          />
+        </div>
       </v-card-text>
     </v-card>
 
@@ -290,6 +312,8 @@ const getEmbedWithAutoplay = (url?: string) => {
         </v-card-text>
       </v-card>
     </v-dialog>
+
+    <exercise-preview v-model="preview.open" :exercise="preview.exercise" />
   </v-container>
 </template>
 

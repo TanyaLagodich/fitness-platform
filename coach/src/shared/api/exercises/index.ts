@@ -55,5 +55,11 @@ export const useExercisesApi = () => {
     addBodyPart: async (name: string) => api.post('/bodyParts', { name }),
     addEquipment: async (name: string) => api.post('/equipments', { name }),
     addTag: async (name: string) => api.post('/tags', { name }),
+    deleteBodyPart: async (id: string) => api.delete(`/bodyParts/${id}`),
+    deleteEquipment: async (id: string) => api.delete(`/equipments/${id}`),
+    deleteTag: async (id: string) => api.delete(`/tags/${id}`),
+    getBodyParts: async () => api.get('/bodyParts'),
+    getEquipments: async () => api.get('/equipments'),
+    getTags: async () => api.get('/tags'),
   };
 };

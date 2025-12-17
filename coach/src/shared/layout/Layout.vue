@@ -1,4 +1,5 @@
 <script setup lang="ts">
+defineOptions({ name: 'AppLayout' });
 import { ref } from 'vue';
 const drawer = ref<boolean>(false);
 
@@ -10,10 +11,10 @@ const items = ref([
     name: 'clients',
   },
   {
-    title: 'Упражнения',
-    value: 'exercise',
+    title: 'Библиотека',
+    value: 'library-exercises',
     link: true,
-    name: 'exercise',
+    name: 'library-exercises',
   },
 ]);
 </script>

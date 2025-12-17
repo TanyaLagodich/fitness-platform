@@ -30,10 +30,10 @@ api.interceptors.response.use(
         localStorage.removeItem('token');
         router.push('/auth/sign-in');
       } else if (error.response.status === 400) {
-        notificationStore.toggle(error.response.data.message || 'Ошибка запроса');
+        notificationStore.toggle(error.response.data.message || 'Ошибка запроса', 'error');
       }
     } else {
-      notificationStore.toggle('Ошибка сети или сервер недоступен');
+      notificationStore.toggle('Ошибка сети или сервер недоступен', 'error');
     }
 
     return Promise.reject(error);

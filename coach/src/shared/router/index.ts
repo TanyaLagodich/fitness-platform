@@ -4,6 +4,12 @@ import ClientList from '../../pages/clients/ui/client-list/client-list.vue';
 import { Client } from '../../pages/clients/client';
 import { AddWorkout } from '../../pages/workout';
 import { ExerciseManagement } from '@/pages/exercise';
+import {
+  LibraryLayout,
+  LibraryTags,
+  LibraryBodyParts,
+  LibraryEquipments,
+} from '@/pages/library';
 import { AuthLayout, SignUp, SignIn } from '@/pages/auth/index.ts';
 import WorkoutDetails from '@/pages/workout/ui/workout-details/workout-details.vue';
 
@@ -56,7 +62,18 @@ const routes = [
       {
         path: '/exercise',
         name: 'exercise',
-        component: ExerciseManagement,
+        redirect: { name: 'library-exercises' },
+      },
+      {
+        path: '/library',
+        component: LibraryLayout,
+        children: [
+          { path: '', redirect: { name: 'library-exercises' } },
+          { path: 'exercises', name: 'library-exercises', component: ExerciseManagement },
+          { path: 'tags', name: 'library-tags', component: LibraryTags },
+          { path: 'bodyparts', name: 'library-bodyparts', component: LibraryBodyParts },
+          { path: 'equipments', name: 'library-equipments', component: LibraryEquipments },
+        ],
       },
     ],
   },

@@ -17,6 +17,8 @@ const emits = defineEmits<{
 const exerciseManagementStore = useExerciseManagementStore();
 const exerciseMetaData = exerciseManagementStore.exerciseMetaData;
 const exercisesApi = useExercisesApi();
+const errorMessage = ref('');
+const saving = ref(false);
 
 const form = ref<Exercise>({
   _id: undefined,
@@ -55,7 +57,36 @@ watch(
 );
 
 const close = () => emits('update:modelValue', false);
-const submit = () => emits('save', { ...form.value });
+const submit = async () => {
+  errorMessage.value = '';
+  const name = form.value.name?.trim();
+  if (!name) {
+    errorMessage.value = 'Введите название упражнения';
+    return;
+  }
+
+  const uniq = (arr: string[]) => {
+    const seen = new Set<string>();
+    return arr
+      .map((v) => v.trim())
+      .filter((v) => v.length)
+      .filter((v) => {
+        const key = v.toLowerCase();
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+  };
+
+  form.value.name = name;
+  form.value.bodyParts = uniq(form.value.bodyParts);
+  form.value.equipments = uniq(form.value.equipments);
+  form.value.tags = uniq(form.value.tags);
+
+  saving.value = true;
+  emits('save', { ...form.value });
+  saving.value = false;
+};
 
 onMounted(exerciseManagementStore.fetchExerciseMetaData);
 
@@ -117,6 +148,10 @@ const handleMetaChange = async (
         <span class="text-h6">{{ form._id ? 'Редактировать упражнение' : 'Новое упражнение' }}</span>
         <v-btn icon="mdi-close" variant="text" @click="close" />
       </v-card-title>
+
+      <v-alert v-if="errorMessage" type="error" variant="tonal" class="mx-4 mt-2">
+        {{ errorMessage }}
+      </v-alert>
 
       <v-card-text class="d-flex flex-column ga-4">
         <v-text-field v-model="form.name" label="Название" required />
@@ -206,7 +241,7 @@ const handleMetaChange = async (
 
       <v-card-actions class="justify-end">
         <v-btn variant="text" @click="close">Отмена</v-btn>
-        <v-btn color="primary" :disabled="!form.name" @click="submit">
+        <v-btn color="primary" :disabled="!form.name || saving" :loading="saving" @click="submit">
           {{ form._id ? 'Сохранить' : 'Создать' }}
         </v-btn>
       </v-card-actions>
