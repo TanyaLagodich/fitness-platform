@@ -3,6 +3,7 @@ import Layout from '@/shared/layout/Layout.vue';
 import ClientList from '../../pages/clients/ui/client-list/client-list.vue';
 import { Client } from '../../pages/clients/client';
 import { AddWorkout } from '../../pages/workout';
+import { ExerciseManagement } from '@/pages/exercise';
 import { AuthLayout, SignUp, SignIn } from '@/pages/auth/index.ts';
 import WorkoutDetails from '@/pages/workout/ui/workout-details/workout-details.vue';
 
@@ -55,7 +56,7 @@ const routes = [
       {
         path: '/exercise',
         name: 'exercise',
-        component: Client,
+        component: ExerciseManagement,
       },
     ],
   },

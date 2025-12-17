@@ -11,11 +11,11 @@ export const useExercisesApi = () => {
     }
   };
 
-  const getExercises = async (filters: Partial<QueryParams> = {}) => {
+  const getExercises = async (filters: Partial<Record<string, unknown>> = {}) => {
     try {
       const cleanedFilters = Object.fromEntries(
         Object.entries(filters).filter(
-          ([_, value]) =>
+          ([, value]) =>
             value !== undefined &&
             value !== null &&
             value !== '' &&
@@ -50,5 +50,10 @@ export const useExercisesApi = () => {
     createExercise,
     getExercises,
     getMetaDataOfExercises,
+    updateExercise: async (id: string, exercise: Exercise) => api.put(`/exercises/${id}`, exercise),
+    deleteExercise: async (id: string) => api.delete(`/exercises/${id}`),
+    addBodyPart: async (name: string) => api.post('/bodyParts', { name }),
+    addEquipment: async (name: string) => api.post('/equipments', { name }),
+    addTag: async (name: string) => api.post('/tags', { name }),
   };
 };

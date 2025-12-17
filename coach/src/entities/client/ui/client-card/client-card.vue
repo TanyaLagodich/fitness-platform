@@ -20,7 +20,7 @@ const initials = computed(() => props.client.name?.charAt(0)?.toUpperCase() ?? '
         <v-avatar size="44" color="primary">
           <v-img v-if="client.photo" :alt="client.name" :src="client.photo" cover />
           <span v-else class="text-button text-white">{{ initials }}</span>
-        </v-avatar>
+      </v-avatar>
         <div class="flex-grow-1">
           <div class="text-subtitle-1 font-weight-medium">{{ client.name }}</div>
           <div class="text-body-2 text-medium-emphasis">{{ client.email }}</div>

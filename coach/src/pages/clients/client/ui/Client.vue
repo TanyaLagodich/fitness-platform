@@ -46,6 +46,10 @@ const openWorkout = (workout: Workout) => {
   router.push(`/client/${clientId.value}/workout/${id}`);
 };
 
+const goBackToClients = () => {
+  router.push({ name: 'clients' });
+};
+
 onMounted(async () => {
   try {
     isLoading.value = true;
@@ -69,6 +73,7 @@ onMounted(async () => {
       <div class="d-flex flex-column ga-3">
         <div class="d-flex align-center justify-space-between ga-4 flex-wrap">
           <div class="d-flex align-center ga-3">
+            <v-btn icon="mdi-arrow-left" variant="text" @click="goBackToClients" />
             <v-avatar color="primary" size="52">
               <span class="text-h6 text-white">{{ clientInitial }}</span>
             </v-avatar>
